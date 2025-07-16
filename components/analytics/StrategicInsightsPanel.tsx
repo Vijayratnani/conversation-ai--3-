@@ -85,7 +85,7 @@ const StrategicInsightsPanel: React.FC<StrategicInsightsPanelProps> = ({
         </div>
         <div className="bg-muted/30 p-3 rounded-md">
           <div className="space-y-2">
-            {growthOpportunities.map((item) => (
+            {(growthOpportunities ?? []).map((item) => (
               <div key={item.id} className="flex items-center justify-between text-xs">
                 <span className="font-medium">{item.topic}</span>
                 <Button

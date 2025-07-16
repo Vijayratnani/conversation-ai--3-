@@ -1,3 +1,4 @@
+// @/types/dashboardTypes
 import type { LucideIcon } from "lucide-react"
 
 export interface ProductKnowledgeItem {

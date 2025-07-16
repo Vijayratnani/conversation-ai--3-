@@ -45,7 +45,7 @@ const AgentKnowledgeInsightsGrid: React.FC<AgentKnowledgeInsightsGridProps> = ({
             Product Knowledge Level
           </h3>
           <div className="space-y-3">
-            {productKnowledgeLevels.map((item) => (
+            {(productKnowledgeLevels ?? []).map((item) => (
               <div
                 key={item.product}
                 className="bg-white dark:bg-muted/20 p-3 rounded-md shadow-sm border border-muted/50 cursor-pointer hover:shadow-md transition-shadow"
@@ -91,7 +91,7 @@ const AgentKnowledgeInsightsGrid: React.FC<AgentKnowledgeInsightsGridProps> = ({
           </h3>
           <div className="bg-white dark:bg-muted/20 p-4 rounded-md shadow-sm border border-muted/50">
             <div className="space-y-4">
-              {scriptAdherenceData.map((item) => (
+              {(scriptAdherenceData ?? []).map((item) => (
                 <div
                   key={item.id}
                   className="space-y-1 cursor-pointer hover:bg-muted/30 p-2 rounded-md transition-colors"

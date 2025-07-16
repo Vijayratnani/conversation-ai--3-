@@ -4,6 +4,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from db.base_class import Base, JSONB_GENERIC
 import enum
+from models.transcript import Transcript
 
 class CallStatus(str, enum.Enum):
     COMPLETED = "completed"
@@ -14,7 +15,9 @@ class Call(Base):
     __tablename__ = 'calls'
     id = Column(Integer, primary_key=True, index=True)
     agent_id = Column(Integer, ForeignKey('agents.id'), nullable=False)
-    customer_phone_number = Column(String, nullable=False)
+    # customer_phone_number = Column(String, nullable=False)
+    call_duration = Column(Float)  # in seconds
+    customer_sentiment = Column(String(50))  # 'positive', 'negative', 'neutral'
     start_time = Column(DateTime(timezone=True), server_default=func.now())
     end_time = Column(DateTime(timezone=True))
     duration_seconds = Column(Integer)

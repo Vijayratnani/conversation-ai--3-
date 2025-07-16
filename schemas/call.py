@@ -6,7 +6,7 @@ from models.call import CallStatus
 # Base schema with common attributes
 class CallBase(BaseModel):
     agent_id: int
-    customer_phone_number: str
+    # customer_phone_number: str
     recording_url: Optional[str] = None
     analysis_metadata: Optional[dict[str, Any]] = None
 

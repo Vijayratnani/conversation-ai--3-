@@ -10,7 +10,7 @@ class CallService:
         Generates aggregated statistics for the main dashboard.
         """
         # Total calls
-        total_calls_stmt = select(func.count(Call.call_id))
+        total_calls_stmt = select(func.count(Call.id))
         total_calls_res = await db.execute(total_calls_stmt)
         total_calls = total_calls_res.scalar_one()
 
@@ -21,7 +21,7 @@ class CallService:
 
         # Sentiment distribution
         sentiment_stmt = select(
-            Call.customer_sentiment, func.count(Call.call_id)
+            Call.customer_sentiment, func.count(Call.id)
         ).group_by(Call.customer_sentiment)
         sentiment_res = await db.execute(sentiment_stmt)
         sentiments = {s[0]: s[1] for s in sentiment_res.all() if s[0]}
@@ -41,7 +41,7 @@ class CallService:
 
         return DashboardStats(
             total_calls=total_calls,
-            average_duration_seconds=round(avg_duration, 2),
+            average_call_duration=round(avg_duration, 2),
             sentiment_distribution=sentiment_data,
             growth_opportunities=growth_opportunities,
         )

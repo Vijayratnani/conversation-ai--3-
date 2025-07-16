@@ -14,13 +14,16 @@ class AgentPerformance(BaseModel):
     average_sentiment: float
 
 class GrowthOpportunity(BaseModel):
-    opportunity_type: str
-    count: int
-    description: str = None
+    # opportunity_type: str
+    # count: int
+    # description: str = ''
+    topic: str
+    mentions: int
+
 
 class DashboardStats(BaseModel):
     total_calls: int
     average_call_duration: float
     sentiment_distribution: SentimentData
-    top_performing_agents: List[AgentPerformance]
-    growth_opportunities: Dict[str, int]  # or List[GrowthOpportunity] if you want to use the new class
+    # top_performing_agents: List[AgentPerformance]
+    growth_opportunities: List[GrowthOpportunity]

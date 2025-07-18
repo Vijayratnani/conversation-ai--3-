@@ -1,27 +1,75 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
+####################################
+# FRONTEND
+####################################
+
 # dependencies
-/node_modules
+/frontend/node_modules
 
-# next.js
-/.next/
-/out/
+# Next.js build output
+/frontend/.next/
+/frontend/out/
 
-# production
-/build
+# production build
+/frontend/build
 
-# debug
+# debug logs
 npm-debug.log*
+pnpm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-.pnpm-debug.log*
 
 # env files
-.env*
+/frontend/.env*
+/frontend/.env.local
+/frontend/.env.production
 
-# vercel
-.vercel
+# Vercel deployment
+.vercel/
 
-# typescript
-*.tsbuildinfo
-next-env.d.ts
+# TypeScript
+/frontend/*.tsbuildinfo
+/frontend/next-env.d.ts
+
+
+####################################
+# BACKEND
+####################################
+
+# Python venv
+/backend/venv/
+/backend/env/
+
+# Python cache
+**/__pycache__/
+**/*.py[cod]
+**/*.pyo
+**/*.pyd
+
+# DB or temp files
+/backend/*.sqlite3
+/backend/*.db
+/backend/*.log
+
+# Python env files
+/backend/.env*
+*.env
+
+
+####################################
+# PROJECT-LEVEL
+####################################
+
+# Ignore system files and general logs
+.DS_Store
+*.log
+*.swp
+
+# Editor directories and files
+.vscode/
+.idea/
+
+# OS-specific
+Thumbs.db
+ehthumbs.db

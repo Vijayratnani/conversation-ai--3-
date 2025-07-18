@@ -1,14 +1,24 @@
-version: '3'
+version: '3.8'
 
 services:
-  conversation-ai:
+  frontend:
     build:
-      context: .
-      dockerfile: Dockerfile
-    restart: always
+      context: ./frontend
+      dockerfile: ../Dockerfile  # assuming Dockerfile for frontend remains in root
     ports:
       - "3000:3000"
     environment:
       - NODE_ENV=production
+    depends_on:
+      - backend
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile  # create a Dockerfile inside backend/
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
     volumes:
-      - ./data:/app/data
+      - ./backend:/app

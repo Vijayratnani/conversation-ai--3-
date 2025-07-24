@@ -171,7 +171,7 @@ export default function Dashboard() {
       )}
 
       {/* Product Stat Detail Dialog */}
-      {selectedProductStat && (
+      {/*{selectedProductStat && (
         <Dialog open={isProductStatDetailDialogOpen} onOpenChange={setIsProductStatDetailDialogOpen}>
           <DialogContent className="sm:max-w-lg md:max-w-xl lg:max-w-2xl">
             <DialogHeader>
@@ -191,7 +191,7 @@ export default function Dashboard() {
             </div>
           </DialogContent>
         </Dialog>
-      )}
+      )} */}
 
       {/* Script Adherence Detail Dialog */}
       {selectedScriptAdherenceItem && (

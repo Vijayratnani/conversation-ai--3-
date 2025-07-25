@@ -13,7 +13,7 @@ from sqlalchemy.sql import func
 from db.base_class import Base
 
 
-class CallAnalysisMetadata(Base):
+class CallAnalysisMetadata(Base):  
     __tablename__ = "call_analysis_metadata"
 
     analysis_id = Column(Integer, primary_key=True, index=True)

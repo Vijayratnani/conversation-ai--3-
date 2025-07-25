@@ -23,8 +23,8 @@ async def get_dashboard_stats(
 async def product_stats(db: AsyncSession = Depends(get_db)):
     return await get_dashboard_product_stats(db)
 
-# api/v1/endpoints/dashboard.py
-@router.get("/product/{product_id}/drilldown", response_model=DrillDownDetails)
-async def get_drilldown(product_id: int, db: AsyncSession = Depends(get_db)):
-    return await get_drilldown_details(product_id, db)
+# # api/v1/endpoints/dashboard.py
+# @router.get("/product/{product_id}/drilldown", response_model=DrillDownDetails)
+# async def get_drilldown(product_id: int, db: AsyncSession = Depends(get_db)):
+#     return await get_drilldown_details(product_id, db)
 

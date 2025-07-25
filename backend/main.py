@@ -22,11 +22,11 @@ except ImportError as e:
     logger.error(f"Failed to import api_router: {e}")
     raise
 
-try:
-    from api.v1.endpoints import drill_down
-    logger.info("Successfully imported drill_down")
-except ImportError as e:
-    logger.error(f"Failed to import drill_down: {e}")
+# try:
+#     from api.v1.endpoints import drill_down
+#     logger.info("Successfully imported drill_down")
+# except ImportError as e:
+#     logger.error(f"Failed to import drill_down: {e}")
     # This might be optional, so we can continue without it
 
 # # Only for running directly
@@ -69,7 +69,7 @@ app.include_router(api_router, prefix=settings.API_V1_STR)
 def read_root():
     return {"message": "Welcome to the Call Analytics API"}
 
-@app.get("/api/categories")
-async def get_categories():
-    from data.store import DRILL_DOWN_DATA
-    return {"categories": list(DRILL_DOWN_DATA.keys())}
+# @app.get("/api/categories")
+# async def get_categories():
+#     from data.store import DRILL_DOWN_DATA
+#     return {"categories": list(DRILL_DOWN_DATA.keys())}

@@ -1,3 +1,21 @@
+// const { data: productStats } = useProductStats();
+// const { data: agentKPI } = useAgentKPI();
+
+// <DashboardTabs
+//   productStats={productStats || []}
+//   agentKPI={agentKPI || []}
+//   ...
+// />
+
+
+
+
+
+
+
+
+
+
 // components/dashboard/DashboardTabs.tsx
 import {
   Tabs,

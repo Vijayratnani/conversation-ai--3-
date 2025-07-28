@@ -5,6 +5,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE TABLE agents (
     agent_id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,--column added 
     team VARCHAR(100),
     hire_date DATE,
     is_active BOOLEAN DEFAULT TRUE,
@@ -142,3 +143,4 @@ CREATE INDEX idx_script_adherence_call_id ON script_adherence(call_id);
 CREATE INDEX idx_product_knowledge_scores_agent_id ON product_knowledge_scores(agent_id);
 CREATE INDEX idx_product_knowledge_scores_product_id ON product_knowledge_scores(product_id);
 CREATE INDEX idx_call_environment_factors_call_id ON call_environment_factors(call_id);
+CREATE INDEX idx_agents_email ON agents(email);--this is added

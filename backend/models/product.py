@@ -7,7 +7,8 @@ class Product(Base):
 
     product_id = Column(Integer, primary_key=True, index=True)
     name = Column(String(255), nullable=False, unique=True)
-    category = Column(String(100), nullable=True)
+    #category = Column(String(100), nullable=True)
+    category = Column(String(100))
 
     # Optional: Add relationships here if needed, e.g., to adherence or knowledge score
     # script_adherences = relationship("ScriptAdherence", back_populates="product")

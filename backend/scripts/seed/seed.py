@@ -34,16 +34,19 @@ NUM_CALLS_PER_AGENT = 25
 
 async def seed_agents(db: AsyncSession):
     print("Seeding agents...")
+
     agents = [
         Agent(
-            name=fake.name(),
-            email=fake.unique.email(),
-            team=fake.word(),
-            hire_date=fake.date_this_decade(),
+            name=fake.name(),  # <--- required
+            email=fake.unique.email(),  # <--- required and must be unique
+            team=fake.word(),  # <--- optional
+            hire_date=fake.date_between(start_date='-3y', end_date='today'),  # <--- optional
+            is_active=fake.boolean(chance_of_getting_true=90),  # <--- default: True
         )
         for _ in range(NUM_AGENTS)
     ]
-    db.add_all(agents)
+
+    db.add_all(agents)  # <--- Bulk insert
     await db.commit()
     return agents
 
@@ -56,14 +59,19 @@ async def seed_customers(db: AsyncSession):
 
 async def seed_products(db: AsyncSession):
     print("Seeding products...")
-    products = [Product(name=fake.unique.word().capitalize(), category=fake.word().capitalize()) for _ in range(NUM_PRODUCTS)]
+    products = [Product( name=fake.unique.word().capitalize(),
+            category=fake.word().capitalize() ) for _ in range(NUM_PRODUCTS)]
     db.add_all(products)
     await db.commit()
     return products
 
 async def seed_topics(db: AsyncSession):
     print("Seeding topics...")
-    topics = [Topic(name_en=name, name_ur=f"{name} (Urdu)", category=fake.word()) for name in ["Pricing", "Support", "Login", "Upgrade", "Cancellation"]]
+    topics = [Topic(
+        name_en=name,                               
+        name_ur=f"{name} (Urdu)",                  
+        category=fake.word() 
+        ) for name in ["Pricing", "Support", "Login", "Upgrade", "Cancellation"]]
     db.add_all(topics)
     await db.commit()
     return topics

@@ -13,7 +13,7 @@ from sqlalchemy import (
     UUID as PG_UUID,
 )
 from sqlalchemy.orm import relationship
-from sqlalchemy.dialects.postgresql import JSONB,UUID
+from sqlalchemy.dialects.postgresql import JSONB,UUID,ENUM
 from sqlalchemy.sql import func
 from db.base_class import Base
 
@@ -29,7 +29,11 @@ class Call(Base):
     customer_id = Column(Integer, ForeignKey("customers.customer_id"))
     call_timestamp = Column(DateTime(timezone=True), nullable=False)
     duration_seconds = Column(Integer, nullable=False)
-    direction = Column(String(10))
+    #direction = Column(String(10))
+    direction = Column(
+        ENUM('inbound', 'outbound', name='call_direction_enum', create_type=True),
+        nullable=False
+    )
     outcome = Column(String(50))
     customer_sentiment = Column(String(50))
     agent_sentiment = Column(String(50))

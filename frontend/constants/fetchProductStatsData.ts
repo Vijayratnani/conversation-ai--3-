@@ -55,7 +55,7 @@ const productStyles: Record<
 }
 
 export async function fetchProductStats(): Promise<ProductStatItem[]> {
-  const res = await fetch("http://localhost:8000/api/v1/dashboard/product-stats")
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/dashboard/product-stats`)
   if (!res.ok) throw new Error("Failed to fetch product stats")
 
   const data = await res.json()

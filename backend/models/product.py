@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String
+from sqlalchemy.orm import relationship
 from db.base_class import Base
 
 
@@ -12,3 +13,4 @@ class Product(Base):
     # Optional: Add relationships here if needed, e.g., to adherence or knowledge score
     # script_adherences = relationship("ScriptAdherence", back_populates="product")
     # product_knowledge_scores = relationship("ProductKnowledgeScore", back_populates="product")
+    knowledge_scores = relationship("ProductKnowledgeScores", back_populates="product", cascade="all, delete-orphan")

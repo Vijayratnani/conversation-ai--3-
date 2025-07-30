@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, ForeignKey, Numeric, Text, Date
+from sqlalchemy import Column, Integer, ForeignKey, Numeric, Text, Date, UniqueConstraint
 from sqlalchemy.orm import relationship
 from db.base_class import Base
 
@@ -12,6 +12,8 @@ class ProductKnowledgeScore(Base):
     issues_noted = Column(Text)
     assessment_date = Column(Date, nullable=False)
 
+    __table_args__ = (UniqueConstraint("agent_id", "product_id", "assessment_date", name="_agent_product_date_uc"),)
+ 
     # Relationships
     agent = relationship("Agent", back_populates="knowledge_scores")
     product = relationship("Product", back_populates="knowledge_scores")

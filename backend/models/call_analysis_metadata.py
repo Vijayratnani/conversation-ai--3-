@@ -7,17 +7,17 @@ from db.base_class import Base
 class CallAnalysisMetadata(Base):
     __tablename__ = 'call_analysis_metadata'
 
-    analysis_id = Column(Integer, primary_key=True, index=True)
-    call_id = Column(UUID(as_uuid=True), ForeignKey('calls.call_id'), nullable=False)
+    call_analysis_id = Column(Integer, primary_key=True, index=True)
+    call_id = Column(UUID(as_uuid=True), ForeignKey('calls.call_id'), nullable=False,unique=True)
 
     sentiment = Column(String(50))
     emotions = Column(ARRAY(String))
     intent = Column(ARRAY(String))
-    threat = Column(Boolean)
+    threat = Column(Boolean,default=False)
     churn_risk = Column(String(50))
     entities = Column(ARRAY(String))
-    opportunity_detected = Column(Boolean)
-    agent_responded = Column(Boolean)
+    opportunity_detected = Column(Boolean,default=False)
+    agent_responded = Column(Boolean,default=False)
     agent_response_score = Column(Numeric(3, 2))
     compliance_score = Column(Numeric(5, 2))
 
@@ -31,4 +31,4 @@ class CallAnalysisMetadata(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     # Relationships
-    call = relationship("Call", back_populates="analysis_metadata")
+    call = relationship("Call", back_populates="analysis_metadata", uselist=False)

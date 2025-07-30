@@ -1,6 +1,6 @@
 import datetime
 import uuid
-from sqlalchemy import Column, String, Integer, Boolean, DateTime, ForeignKey, Text, Numeric
+from sqlalchemy import Column, String, Integer, CheckConstraint, Boolean, DateTime, ForeignKey, Text, Numeric
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import JSONB
@@ -15,7 +15,10 @@ class Call(Base):
     customer_id = Column(Integer, ForeignKey('customers.customer_id'))
     call_timestamp = Column(DateTime(timezone=True), nullable=False)
     duration_seconds = Column(Integer, nullable=False)
-    direction = Column(String(10))
+    direction = Column(String(10), nullable=False)  # <--- this line
+    __table_args__ = (
+        CheckConstraint("direction IN ('inbound', 'outbound')", name="check_call_direction"),  # <--- this line
+    )
     outcome = Column(String(50))
     customer_sentiment = Column(String(50))
     agent_sentiment = Column(String(50))
@@ -39,4 +42,4 @@ class Call(Base):
     script_adherences = relationship("ScriptAdherence", back_populates="call")
     environment_factors = relationship("CallEnvironmentFactor", back_populates="call")
     topics = relationship("CallTopic", back_populates="call")
-    analysis_metadata = relationship("CallAnalysisMetadata", back_populates="call", uselist=False)
+    call_analysis_metadata = relationship("CallAnalysisMetadata", back_populates="call", uselist=False)

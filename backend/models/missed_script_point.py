@@ -6,7 +6,7 @@ class MissedScriptPoint(Base):
     __tablename__ = 'missed_script_points'
 
     missed_point_id = Column(Integer, primary_key=True, index=True)
-    adherence_id = Column(ForeignKey("script_adherence.adherence_id"), nullable=False)
+    adherence_id = Column(Integer, ForeignKey("script_adherence.adherence_id"), nullable=False)
     point_description = Column(Text, nullable=False)
     frequency = Column(Integer)
     impact = Column(Text)

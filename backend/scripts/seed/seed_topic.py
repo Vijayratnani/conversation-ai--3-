@@ -24,4 +24,4 @@ async def seed_topics(db, num_records=5):  # default 20 topics, adjust as needed
         return records
 
     except Exception as e:
-        raise Exception(f"Error while seeding call_environment_factor: {e}") 
+        raise Exception(f"Error while seeding topics: {e}") 

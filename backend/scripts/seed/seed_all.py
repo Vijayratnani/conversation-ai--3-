@@ -43,8 +43,9 @@ async def main():
             try:
                 print("🌱 Seeding Customers...")
                 customers = await seed_customers(session)
-                print(f"✅ Seeded {len(customers)} customers.")
                 await session.commit()
+                customer_ids = [customer.customer_id for customer in customers if customer.customer_id is not None]  
+                print(f"✅ Seeded {len(customers)} customers.")
             except Exception as e:
                 raise Exception(f"Error in seed_customers: {e}")
 
@@ -59,7 +60,7 @@ async def main():
 
             try:
                 print("🌱 Seeding Calls...")
-                calls = await seed_calls(session)
+                calls = await seed_calls(session,agent_ids, customer_ids )
                 await session.commit()
                 call_ids = [call.call_id for call in calls]
                 print(f"✅ Seeded {len(calls)} calls.")

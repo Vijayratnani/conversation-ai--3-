@@ -3,12 +3,12 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sess
 from db.base import Base
 from core.config import settings
 
-from scripts.seed.seed_agents import seed_agents
-from scripts.seed.seed_calls import seed_calls
-from scripts.seed.seed_products import seed_products
-from scripts.seed.seed_script_adherence import seed_script_adherence
-from scripts.seed.seed_product_knowledge_score import seed_product_knowledge_score
-from scripts.seed.seed_call_analysis_metadata import seed_call_analysis_metadata
+from scripts.seedv1.seed_agents import seed_agents
+from scripts.seedv1.seed_calls import seed_calls
+from scripts.seedv1.seed_products import seed_products
+from scripts.seedv1.seed_script_adherence import seed_script_adherence
+from scripts.seedv1.seed_product_knowledge_score import seed_product_knowledge_score
+from scripts.seedv1.seed_call_analysis_metadata import seed_call_analysis_metadata
 
 # ✅ Database URL and engine setup
 DATABASE_URL = settings.DATABASE_URL

@@ -1,109 +1,151 @@
-// components/analytics/AgentPerformancePanel.tsx
 'use client'
 
-import React from 'react'
-import { ArrowDownRight, ArrowUpRight, BarChart3, FileText, Headphones, Package } from 'lucide-react'
+import React, { useEffect, useState } from 'react'
+import {
+  ArrowDownRight,
+  ArrowUpRight,
+  BarChart3,
+  FileText,
+  Headphones,
+  Package,
+} from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 
-const AgentPerformancePanel = () => {
-  const agentStats = [
-    {
-      title: 'Avg. Call Quality',
-      value: '86%',
-      icon: <Headphones className="h-4 w-4 text-primary" />,
-      change: '+2% from last month',
-      trendIcon: <ArrowUpRight className="h-3 w-3 mr-1" />,
-    },
-    {
-      title: 'Script Adherence',
-      value: '92%',
-      icon: <FileText className="h-4 w-4 text-primary" />,
-      change: '+4% from last month',
-      trendIcon: <ArrowUpRight className="h-3 w-3 mr-1" />,
-    },
-    {
-      title: 'Avg. Handle Time',
-      value: '5:24',
-      icon: <BarChart3 className="h-4 w-4 text-primary" />,
-      change: '-18s from last month',
-      trendIcon: <ArrowDownRight className="h-3 w-3 mr-1" />,
-    },
-    {
-      title: 'Customer Satisfaction',
-      value: '4.6/5',
-      icon: <Package className="h-4 w-4 text-primary" />,
-      change: '+0.2 from last month',
-      trendIcon: <ArrowUpRight className="h-3 w-3 mr-1" />,
-    },
-  ]
+const iconMap: Record<string, JSX.Element> = {
+  'Avg. Call Quality': <Headphones className="h-4 w-4 text-primary" />,
+  'Script Adherence': <FileText className="h-4 w-4 text-primary" />,
+  'Avg. Handle Time': <BarChart3 className="h-4 w-4 text-primary" />,
+  'Customer Satisfaction': <Package className="h-4 w-4 text-primary" />,
+}
 
-  const topAgents = [
-    { name: 'Sarah K.', score: 94, product: 'Credit Cards', improvement: '+3%' },
-    { name: 'Michael R.', score: 92, product: 'Personal Loans', improvement: '+5%' },
-    { name: 'Jessica T.', score: 91, product: 'Savings Accounts', improvement: '+2%' },
-  ]
+const AgentPerformancePanel = () => {
+  const [agentStats, setAgentStats] = useState<any[]>([])
+  const [knowledge, setKnowledge] = useState<any>(null)
+  const [topAgents, setTopAgents] = useState<any[]>([])
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/agent-performance`) // update with actual endpoint
+      const data = await res.json()
+
+      const formattedStats = data.agent_stats.map((stat: any) => ({
+        title: stat.title,
+        value: stat.value,
+        change: stat.change,
+        icon: iconMap[stat.title] || <Package className="h-4 w-4 text-primary" />,
+        trendIcon:
+          stat.trend === 'up' ? (
+            <ArrowUpRight className="h-3 w-3 mr-1" />
+          ) : (
+            <ArrowDownRight className="h-3 w-3 mr-1" />
+          ),
+        isPositive: stat.trend === 'up',
+      }))
+
+      setAgentStats(formattedStats)
+      setKnowledge(data.knowledge_distribution)
+      setTopAgents(data.top_agents)
+    }
+
+    fetchData()
+  }, [])
+
+  const getTrendColor = (isPositive: boolean) =>
+    isPositive ? 'text-green-600' : 'text-red-600'
+
+  const totalKnowledge = (knowledge?.excellent ?? 0) + (knowledge?.good ?? 0) + (knowledge?.needs_improvement ?? 0)
+  const getPercentage = (value: number) =>
+    totalKnowledge > 0 ? `${(value / totalKnowledge) * 100}%` : '0%'
 
   return (
     <div className="space-y-6">
-      {/* Agent Knowledge Distribution */}
+      {/* Knowledge Distribution */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="col-span-1 md:col-span-3">
           <div className="grid grid-cols-3 gap-4 h-full">
-            <div className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/30 dark:to-green-800/20 border border-green-100 dark:border-green-800/30 p-4 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex flex-col justify-between">
+            <div className="bg-green-50 dark:bg-green-900/30 p-4 rounded-lg border shadow-md flex flex-col justify-between border-green-100 dark:border-green-800/30">
               <div>
-                <div className="text-3xl font-bold text-green-600 dark:text-green-400">12</div>
-                <div className="text-sm text-green-700 dark:text-green-300 font-medium">Excellent Knowledge</div>
+                <div className="text-3xl font-bold text-green-600 dark:text-green-400">
+                  {knowledge?.excellent ?? 0}
+                </div>
+                <div className="text-sm font-medium text-green-700 dark:text-green-300">
+                  Excellent Knowledge
+                </div>
                 <div className="text-xs text-muted-foreground mt-1">90% or higher</div>
               </div>
               <div className="mt-2 flex items-center text-xs text-green-600">
                 <ArrowUpRight className="h-3 w-3 mr-1" />
-                <span>+2 from last month</span>
+                <span>
+                  {knowledge?.excellent_change >= 0 ? '+' : ''}
+                  {knowledge?.excellent_change} from last month
+                </span>
+
               </div>
             </div>
-            <div className="bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-900/30 dark:to-amber-800/20 border border-amber-100 dark:border-amber-800/30 p-4 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex flex-col justify-between">
+            <div className="bg-amber-50 dark:bg-amber-900/30 p-4 rounded-lg border shadow-md flex flex-col justify-between border-amber-100 dark:border-amber-800/30">
               <div>
-                <div className="text-3xl font-bold text-amber-600 dark:text-amber-400">18</div>
-                <div className="text-sm text-amber-700 dark:text-amber-300 font-medium">Good Knowledge</div>
+                <div className="text-3xl font-bold text-amber-600 dark:text-amber-400">
+                  {knowledge?.good ?? 0}
+                </div>
+                <div className="text-sm font-medium text-amber-700 dark:text-amber-300">
+                  Good Knowledge
+                </div>
                 <div className="text-xs text-muted-foreground mt-1">75-89%</div>
               </div>
               <div className="mt-2 flex items-center text-xs text-amber-600">
                 <ArrowUpRight className="h-3 w-3 mr-1" />
-                <span>+3 from last month</span>
+                <span>
+                  {knowledge?.good_change >= 0 ? '+' : ''}
+                  {knowledge?.good_change} from last month
+                </span>
+
               </div>
             </div>
-            <div className="bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/30 dark:to-red-800/20 border border-red-100 dark:border-red-800/30 p-4 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex flex-col justify-between">
+            <div className="bg-red-50 dark:bg-red-900/30 p-4 rounded-lg border shadow-md flex flex-col justify-between border-red-100 dark:border-red-800/30">
               <div>
-                <div className="text-3xl font-bold text-red-600 dark:text-red-400">7</div>
-                <div className="text-sm text-red-700 dark:text-red-300 font-medium">Needs Improvement</div>
+                <div className="text-3xl font-bold text-red-600 dark:text-red-400">
+                  {knowledge?.needs_improvement ?? 0}
+                </div>
+                <div className="text-sm font-medium text-red-700 dark:text-red-300">
+                  Needs Improvement
+                </div>
                 <div className="text-xs text-muted-foreground mt-1">Below 75%</div>
               </div>
               <div className="mt-2 flex items-center text-xs text-red-600">
                 <ArrowDownRight className="h-3 w-3 mr-1" />
-                <span>-2 from last month</span>
+                <span>
+                  {knowledge?.needs_improvement_change >= 0 ? '+' : ''}
+                  {knowledge?.needs_improvement_change} from last month
+                </span>
+
               </div>
             </div>
           </div>
         </div>
-        <div className="col-span-1 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/20 border border-blue-100 dark:border-blue-800/30 p-4 rounded-lg shadow-sm">
+        <div className="col-span-1 bg-blue-50 dark:bg-blue-900/30 border border-blue-100 dark:border-blue-800/30 p-4 rounded-lg shadow-sm">
           <div className="text-center">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-800/30 mb-2">
-              <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">82%</div>
+              <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                {knowledge?.average_score ?? '--'}%
+              </div>
             </div>
-            <div className="text-sm text-blue-700 dark:text-blue-300 font-medium">Average Knowledge Score</div>
-            <div className="text-xs text-muted-foreground mt-1">+3% from last month</div>
+            <div className="text-sm font-medium text-blue-700 dark:text-blue-300">
+              Average Knowledge Score
+            </div>
+            <div className="text-xs text-muted-foreground mt-1">{knowledge?.trend ?? ''} from last month</div>
           </div>
           <div className="mt-3">
             <div className="text-xs text-muted-foreground mb-1">Knowledge Distribution</div>
             <div className="h-2 w-full bg-muted rounded-full overflow-hidden flex">
-              <div className="h-full bg-green-500" style={{ width: '32%' }}></div>
-              <div className="h-full bg-amber-500" style={{ width: '49%' }}></div>
-              <div className="h-full bg-red-500" style={{ width: '19%' }}></div>
+              <div className="h-full bg-green-500" style={{ width: getPercentage(knowledge?.excellent ?? 0) }} />
+              <div className="h-full bg-amber-500" style={{ width: getPercentage(knowledge?.good ?? 0) }} />
+              <div className="h-full bg-red-500" style={{ width: getPercentage(knowledge?.needs_improvement ?? 0) }} />
             </div>
           </div>
         </div>
       </div>
 
-      {/* Agent KPIs */}
+      {/* KPIs */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {agentStats.map((stat) => (
           <div
@@ -118,7 +160,7 @@ const AgentPerformancePanel = () => {
             </div>
             <div className="mt-2">
               <div className="text-2xl font-bold">{stat.value}</div>
-              <div className="flex items-center text-xs text-green-600 mt-1">
+              <div className={`flex items-center text-xs mt-1 ${getTrendColor(stat.isPositive)}`}>
                 {stat.trendIcon}
                 <span>{stat.change}</span>
               </div>
@@ -127,7 +169,7 @@ const AgentPerformancePanel = () => {
         ))}
       </div>
 
-      {/* Top Performing Agents */}
+      {/* Top Agents */}
       <div className="bg-white dark:bg-muted/20 p-4 rounded-lg shadow-sm border border-muted/50">
         <h3 className="text-sm font-medium mb-3">Top Performing Agents</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

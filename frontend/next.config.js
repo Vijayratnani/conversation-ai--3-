@@ -2,7 +2,7 @@
 const nextConfig = {
   output: "standalone",
   reactStrictMode: true,
-  swcMinify: true,
+  // swcMinify: true,
   eslint: {
     ignoreDuringBuilds: true,
   },

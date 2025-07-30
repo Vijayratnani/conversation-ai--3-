@@ -1,16 +1,7 @@
 import datetime
 import uuid
-from sqlalchemy import (
-    Column,
-    Integer,
-    String,
-    DateTime,
-    ForeignKey,
-    Float,
-    Boolean,
-    Text,
-    UUID as PG_UUID,
-)
+from sqlalchemy import Column, String, Integer, Boolean, DateTime, ForeignKey, Text, Numeric
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.sql import func
@@ -19,11 +10,9 @@ from db.base_class import Base
 class Call(Base):
     __tablename__ = 'calls'
 
-    call_id = Column(PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
-    
-    # agent_id = Column(Integer, ForeignKey('agents.agent_id'), nullable=False)
-    # customer_id = Column(Integer, ForeignKey('customers.customer_id'), nullable=False)
-    
+    call_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
+    agent_id = Column(Integer, ForeignKey('agents.agent_id'))
+    customer_id = Column(Integer, ForeignKey('customers.customer_id'))
     call_timestamp = Column(DateTime(timezone=True), nullable=False)
     duration_seconds = Column(Integer, nullable=False)
     direction = Column(String(10))
@@ -39,16 +28,15 @@ class Call(Base):
     customer_talk_time_seconds = Column(Integer)
     silence_duration_seconds = Column(Integer)
     interruptions = Column(Integer)
-    compliance_score = Column(Float(precision=2))
+    compliance_score = Column(Numeric(5, 2))
     audio_recording_url = Column(Text)
-    analysis_metadata = Column(JSONB)
-
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     # Relationships
-    # agent = relationship("Agent", back_populates="calls")
-    # customer = relationship("Customer", back_populates="calls")
-    # transcripts = relationship("Transcript", back_populates="call", cascade="all, delete-orphan")
-    # call_topics = relationship("CallTopic", back_populates="call", cascade="all, delete-orphan")
-    # analysis = relationship("CallAnalysisMetadata", back_populates="call", uselist=False)
-
+    agent = relationship("Agent", back_populates="calls")
+    customer = relationship("Customer", back_populates="calls")
+    transcripts = relationship("Transcript", back_populates="call")
+    script_adherences = relationship("ScriptAdherence", back_populates="call")
+    environment_factors = relationship("CallEnvironmentFactor", back_populates="call")
+    topics = relationship("CallTopic", back_populates="call")
+    analysis_metadata = relationship("CallAnalysisMetadata", back_populates="call", uselist=False)

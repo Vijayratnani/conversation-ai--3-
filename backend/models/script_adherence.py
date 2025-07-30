@@ -1,13 +1,19 @@
-from sqlalchemy import Column, Integer, Float, Date, ForeignKey
+from sqlalchemy import Column, Integer, ForeignKey, Numeric, Text, Date
 from sqlalchemy.orm import relationship
 from db.base_class import Base
 
 class ScriptAdherence(Base):
-    __tablename__ = "script_adherence"
+    __tablename__ = 'script_adherence'
 
-    id = Column(Integer, primary_key=True, index=True)
-    agent_id = Column(Integer, ForeignKey("agents.agent_id"), nullable=False)
-    score = Column(Float, nullable=False)
-    assessment_date = Column(Date, nullable=False)
+    adherence_id = Column(Integer, primary_key=True, index=True)
+    call_id = Column(ForeignKey("calls.call_id"), nullable=False)
+    product_id = Column(ForeignKey("products.product_id"), nullable=False)
+    score = Column(Numeric(5, 2), nullable=False)
+    trend_from_previous = Column(Numeric(5, 2))
+    top_missed_area = Column(Text)
+    assessment_date = Column(Date, server_default="current_date")
 
-    agent = relationship("Agent", back_populates="script_adherence_scores")
+    # Relationships
+    call = relationship("Call", back_populates="script_adherences")
+    product = relationship("Product", back_populates="script_adherences")
+    missed_points = relationship("MissedScriptPoint", back_populates="adherence")

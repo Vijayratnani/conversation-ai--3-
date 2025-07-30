@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from datetime import date, timedelta
 from models.call import Call
 from models.script_adherence import ScriptAdherence
-from models.product_knowledge_scores import ProductKnowledgeScores
+from models.product_knowledge_score import ProductKnowledgeScore
 from models.agent import Agent
 from models.product import Product
 from schemas.agent_performance import (
@@ -108,24 +108,24 @@ async def get_agent_performance_data(db: AsyncSession) -> AgentPerformanceRespon
     # ────────────── Knowledge Distribution ──────────────
     knowledge_q = await db.execute(
         select(
-            func.count().filter(ProductKnowledgeScores.score >= 90),
-            func.count().filter(ProductKnowledgeScores.score.between(75, 89.99)),
-            func.count().filter(ProductKnowledgeScores.score < 75),
-            func.avg(ProductKnowledgeScores.score),
-        ).where(ProductKnowledgeScores.assessment_date >= first_day_this_month)
+            func.count().filter(ProductKnowledgeScore.score >= 90),
+            func.count().filter(ProductKnowledgeScore.score.between(75, 89.99)),
+            func.count().filter(ProductKnowledgeScore.score < 75),
+            func.avg(ProductKnowledgeScore.score),
+        ).where(ProductKnowledgeScore.assessment_date >= first_day_this_month)
     )
     row = knowledge_q.fetchone()
     excellent, good, needs_improvement, avg_score = row if row else (0, 0, 0, 0)
 
     previous_knowledge_q = await db.execute(
         select(
-            func.count().filter(ProductKnowledgeScores.score >= 90),
-            func.count().filter(ProductKnowledgeScores.score.between(75, 89.99)),
-            func.count().filter(ProductKnowledgeScores.score < 75),
-            func.avg(ProductKnowledgeScores.score),
+            func.count().filter(ProductKnowledgeScore.score >= 90),
+            func.count().filter(ProductKnowledgeScore.score.between(75, 89.99)),
+            func.count().filter(ProductKnowledgeScore.score < 75),
+            func.avg(ProductKnowledgeScore.score),
         ).where(
-            ProductKnowledgeScores.assessment_date >= first_day_last_month,
-            ProductKnowledgeScores.assessment_date < first_day_this_month
+            ProductKnowledgeScore.assessment_date >= first_day_last_month,
+            ProductKnowledgeScore.assessment_date < first_day_this_month
         )
     )
     prev_row = previous_knowledge_q.fetchone()
@@ -149,13 +149,13 @@ async def get_agent_performance_data(db: AsyncSession) -> AgentPerformanceRespon
         select(
             Agent.agent_id,
             Agent.name,
-            ProductKnowledgeScores.score,
+            ProductKnowledgeScore.score,
             Product.name.label("product"),
             Product.product_id
-        ).join(ProductKnowledgeScores, ProductKnowledgeScores.agent_id == Agent.agent_id)
-        .join(Product, Product.product_id == ProductKnowledgeScores.product_id)
-        .where(ProductKnowledgeScores.assessment_date >= first_day_this_month)
-        .order_by(ProductKnowledgeScores.score.desc())
+        ).join(ProductKnowledgeScore, ProductKnowledgeScore.agent_id == Agent.agent_id)
+        .join(Product, Product.product_id == ProductKnowledgeScore.product_id)
+        .where(ProductKnowledgeScore.assessment_date >= first_day_this_month)
+        .order_by(ProductKnowledgeScore.score.desc())
         .limit(3)
     )
     current_rows = top_agents_q.fetchall() or []
@@ -163,12 +163,12 @@ async def get_agent_performance_data(db: AsyncSession) -> AgentPerformanceRespon
 
     for row in current_rows:
         last_score_q = await db.execute(
-            select(ProductKnowledgeScores.score).where(
-                ProductKnowledgeScores.agent_id == row.agent_id,
-                ProductKnowledgeScores.product_id == row.product_id,
-                ProductKnowledgeScores.assessment_date >= first_day_last_month,
-                ProductKnowledgeScores.assessment_date < first_day_this_month,
-            ).order_by(ProductKnowledgeScores.assessment_date.desc()).limit(1)
+            select(ProductKnowledgeScore.score).where(
+                ProductKnowledgeScore.agent_id == row.agent_id,
+                ProductKnowledgeScore.product_id == row.product_id,
+                ProductKnowledgeScore.assessment_date >= first_day_last_month,
+                ProductKnowledgeScore.assessment_date < first_day_this_month,
+            ).order_by(ProductKnowledgeScore.assessment_date.desc()).limit(1)
         )
         last_score = last_score_q.scalar()
         score_diff = (row.score - last_score) if last_score is not None else 0

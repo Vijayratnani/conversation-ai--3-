@@ -145,28 +145,19 @@ async def get_agent_performance_data(db: AsyncSession) -> AgentPerformanceRespon
     )
 
     # ────────────── Top Performing Agents ──────────────
-    # from sqlalchemy.dialects.postgresql import insert, distinct
-
     top_agents_q = await db.execute(
         select(
             Agent.agent_id,
             Agent.name,
             ProductKnowledgeScores.score,
             Product.name.label("product"),
-        Product.product_id
-        )
-        .distinct(ProductKnowledgeScores.agent_id, ProductKnowledgeScores.product_id)
-        .join(ProductKnowledgeScores, ProductKnowledgeScores.agent_id == Agent.agent_id)
+            Product.product_id
+        ).join(ProductKnowledgeScores, ProductKnowledgeScores.agent_id == Agent.agent_id)
         .join(Product, Product.product_id == ProductKnowledgeScores.product_id)
         .where(ProductKnowledgeScores.assessment_date >= first_day_this_month)
-        .order_by(
-            ProductKnowledgeScores.agent_id,
-            ProductKnowledgeScores.product_id,
-            ProductKnowledgeScores.score.desc()
-        )
+        .order_by(ProductKnowledgeScores.score.desc())
         .limit(3)
     )
-
     current_rows = top_agents_q.fetchall() or []
     top_agents = []
 

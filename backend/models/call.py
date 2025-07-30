@@ -23,7 +23,9 @@ class Call(Base):
     __tablename__ = 'calls'
 
     #call_id = Column(PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
-    call_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    #call_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    call_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
+
     
     # agent_id = Column(Integer, ForeignKey('agents.agent_id'), nullable=False)
     # customer_id = Column(Integer, ForeignKey('customers.customer_id'), nullable=False)
@@ -36,7 +38,7 @@ class Call(Base):
     #     ENUM('inbound', 'outbound', name='call_direction_enum', create_type=False),
     #     nullable=False
     # )
-    direction = Column(String(10), nullable=False)  # <--- this line
+    direction = Column(String(10), nullable=False)  
     __table_args__ = (
         CheckConstraint("direction IN ('inbound', 'outbound')", name="check_call_direction"),  # <--- this line
     )
@@ -55,14 +57,16 @@ class Call(Base):
     #compliance_score = Column(Float(precision=2))
     compliance_score = Column(Numeric(5, 2))
     audio_recording_url = Column(Text)
-    analysis_metadata = Column(JSONB)
-
+    # analysis_metadata = Column(JSONB)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
-    # Relationships
-    # agent = relationship("Agent", back_populates="calls")
-    # customer = relationship("Customer", back_populates="calls")
-    # transcripts = relationship("Transcript", back_populates="call", cascade="all, delete-orphan")
-    # call_topics = relationship("CallTopic", back_populates="call", cascade="all, delete-orphan")
-    # analysis = relationship("CallAnalysisMetadata", back_populates="call", uselist=False)
+# Relationships
+    agent = relationship("Agent", back_populates="calls")
+    customer = relationship("Customer", back_populates="calls")
+    transcripts = relationship("Transcript", back_populates="call")
+    script_adherences = relationship("ScriptAdherence", back_populates="call")
+    environment_factors = relationship("CallEnvironmentFactor", back_populates="call")
+    topics = relationship("CallTopic", back_populates="call")
+    call_analysis_metadata = relationship("CallAnalysisMetadata", back_populates="call", uselist=False)
+ 
 

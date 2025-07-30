@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, DateTime,Boolean,Date
 from sqlalchemy.sql import func
 from db.base_class import Base
+from sqlalchemy.orm import relationship
 
 class Agent(Base):
     __tablename__ = 'agents'
@@ -14,3 +15,7 @@ class Agent(Base):
     hire_date = Column(Date) #column added
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    # Relationships
+    calls = relationship("Call", back_populates="agent")
+    knowledge_scores = relationship("ProductKnowledgeScore", back_populates="agent")

@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Integer, Text, ForeignKey
 from db.base_class import Base
+from sqlalchemy.orm import relationship
 
 class MissedScriptPoint(Base):
     __tablename__ = "missed_script_points"
@@ -9,3 +10,6 @@ class MissedScriptPoint(Base):
     point_description = Column(Text, nullable=False)
     frequency = Column(Integer)
     impact = Column(Text)
+
+# Relationships
+    adherence = relationship("ScriptAdherence", back_populates="missed_points")

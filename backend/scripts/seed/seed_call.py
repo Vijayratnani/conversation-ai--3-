@@ -18,7 +18,8 @@ async def seed_calls(db):
             duration = random.randint(30, 3600)  # seconds between 30 sec and 1 hour
             direction = random.choice(['inbound', 'outbound'])
             outcome = random.choice(['resolved', 'unresolved', 'escalated', 'no answer'])
-            sentiment_choices = ['positive', 'neutral', 'negative', 'mixed']
+            customer_sentiment_choices = ['positive', 'neutral', 'negative', 'mixed']
+            agent_sentiment_choices = ['positive', 'neutral', 'negative', 'mixed']
             flagged = fake.boolean(chance_of_getting_true=10)
             sensitive_info = fake.boolean(chance_of_getting_true=5)
             transcript_available = fake.boolean(chance_of_getting_true=80)
@@ -31,8 +32,8 @@ async def seed_calls(db):
                 duration_seconds=duration,
                 direction=direction,
                 outcome=outcome,
-                customer_sentiment=random.choice(sentiment_choices),
-                agent_sentiment=random.choice(sentiment_choices),
+                customer_sentiment=random.choice(customer_sentiment_choices),
+                agent_sentiment=random.choice(agent_sentiment_choices),
                 flagged_for_review=flagged,
                 summary=fake.text(max_nb_chars=200),
                 next_action=fake.text(max_nb_chars=100),

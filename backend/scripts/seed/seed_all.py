@@ -16,6 +16,7 @@ from .seed_transcript_tag import seed_transcript_tags
 from .seed_transcript import seed_transcripts
 from sqlalchemy import text
 
+
 async def main():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
@@ -25,7 +26,8 @@ async def main():
             # 🧹 Delete all data from tables before seeding
             print("🧹 Deleting all existing data...")
             await session.execute(
-                text("TRUNCATE TABLE transcript_tags, transcripts, script_adherence, product_knowledge_scores, missed_script_points, call_topics, call_environment_factors, call_analysis_metadata, calls, products, customers, agents RESTART IDENTITY CASCADE;")
+                # text("TRUNCATE TABLE transcript_tags, transcripts, script_adherence, product_knowledge_scores, missed_script_points, call_topics, call_environment_factors, call_analysis_metadata, calls, products, customers, agents RESTART IDENTITY CASCADE;")
+                text("TRUNCATE TABLE transcript_tags, transcripts, script_adherence, product_knowledge_scores, missed_script_points, call_topics, call_environment_factors, calls, products, customers, agents RESTART IDENTITY CASCADE;")
             )
             await session.commit()
             print("✅ All tables truncated.")
@@ -73,13 +75,13 @@ async def main():
             except Exception as e:
                 raise Exception(f"Error in seed_topics: {e}")
 
-            try:
-                print("🌱 Seeding Call Analysis Metadata...")
-                call_analysis = await seed_call_analysis_metadata(session)
-                await session.commit()
-                print(f"✅ Seeded {len(call_analysis)} call analysis metadata records.")
-            except Exception as e:
-                raise Exception(f"Error in seed_call_analysis_metadata: {e}")
+            # try:
+            #     print("🌱 Seeding Call Analysis Metadata...")
+            #     call_analysis = await seed_call_analysis_metadata(session)
+            #     await session.commit()
+            #     print(f"✅ Seeded {len(call_analysis)} call analysis metadata records.")
+            # except Exception as e:
+            #     raise Exception(f"Error in seed_call_analysis_metadata: {e}")
 
             try:
                 print("🌱 Seeding Call Environment Factors...")

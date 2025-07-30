@@ -16,6 +16,8 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import JSONB,UUID,ENUM
 from sqlalchemy.sql import func
 from db.base_class import Base
+from sqlalchemy import CheckConstraint
+
 
 class Call(Base):
     __tablename__ = 'calls'
@@ -30,9 +32,13 @@ class Call(Base):
     call_timestamp = Column(DateTime(timezone=True), nullable=False)
     duration_seconds = Column(Integer, nullable=False)
     #direction = Column(String(10))
-    direction = Column(
-        ENUM('inbound', 'outbound', name='call_direction_enum', create_type=True),
-        nullable=False
+    # direction = Column(
+    #     ENUM('inbound', 'outbound', name='call_direction_enum', create_type=False),
+    #     nullable=False
+    # )
+    direction = Column(String(10), nullable=False)  # <--- this line
+    __table_args__ = (
+        CheckConstraint("direction IN ('inbound', 'outbound')", name="check_call_direction"),  # <--- this line
     )
     outcome = Column(String(50))
     customer_sentiment = Column(String(50))

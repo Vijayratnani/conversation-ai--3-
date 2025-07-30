@@ -33,3 +33,6 @@ class CallAnalysisMetadata(Base):
     # Relationships
     call = relationship("Call", back_populates="call_analysis_metadata", uselist=False)
 
+
+    # Relationships
+    call = relationship("Call", back_populates="analysis_metadata", uselist=False)

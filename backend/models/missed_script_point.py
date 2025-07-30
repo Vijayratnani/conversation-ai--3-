@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, ForeignKey, Text
 from sqlalchemy.orm import relationship
 from db.base_class import Base
+from sqlalchemy.orm import relationship
 
 class MissedScriptPoint(Base):
     __tablename__ = 'missed_script_points'

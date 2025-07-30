@@ -6,6 +6,8 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import JSONB,UUID,ENUM
 from sqlalchemy.sql import func
 from db.base_class import Base
+from sqlalchemy import CheckConstraint
+
 
 class Call(Base):
     __tablename__ = 'calls'

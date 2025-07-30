@@ -2,6 +2,7 @@ from sqlalchemy import Column, String, Integer, Date, Boolean, DateTime
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 from db.base_class import Base
+from sqlalchemy.orm import relationship
 
 class Agent(Base):
     __tablename__ = 'agents'

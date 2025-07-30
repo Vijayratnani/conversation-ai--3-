@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, ForeignKey, Numeric, Text, Date, UniqueConstraint
 from sqlalchemy.orm import relationship
 from db.base_class import Base
+from sqlalchemy.orm import relationship
 
 class ProductKnowledgeScore(Base):
     __tablename__ = 'product_knowledge_scores'

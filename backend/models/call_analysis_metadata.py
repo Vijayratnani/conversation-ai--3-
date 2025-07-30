@@ -31,4 +31,5 @@ class CallAnalysisMetadata(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     # Relationships
-    call = relationship("Call", back_populates="analysis_metadata", uselist=False)
+    call = relationship("Call", back_populates="call_analysis_metadata", uselist=False)
+

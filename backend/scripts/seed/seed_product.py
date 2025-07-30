@@ -18,4 +18,4 @@ async def seed_products(db):
         # commit will be handled in seed_all.py
 
     except Exception as e:
-        raise Exception(f"Error while seeding call_environment_factor: {e}") 
+        raise Exception(f"Error while seeding product: {e}") 

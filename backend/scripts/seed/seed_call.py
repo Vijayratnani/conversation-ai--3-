@@ -2,16 +2,19 @@
 
 from .seed_config import fake, NUM_CALLS_PER_AGENT, NUM_AGENTS, NUM_CUSTOMERS
 from models.call import Call  # adjust import path
+from models.agent import Agent
+from models.customer import Customer
+from sqlalchemy import select
 import random
 from uuid import uuid4
 import asyncio
 
-async def seed_calls(db):
+async def seed_calls(db,agent_ids,customer_ids):
     try:
         records = []
 
-        agent_ids = list(range(1, NUM_AGENTS + 1))
-        customer_ids = list(range(1, NUM_CUSTOMERS + 1))
+        # agent_ids = list(range(1, NUM_AGENTS + 1))
+        # customer_ids = list(range(1, NUM_CUSTOMERS + 1))
         
         for _ in range(NUM_CALLS_PER_AGENT * NUM_AGENTS):
             call_time = fake.date_time_between(start_date='-1y', end_date='now')
@@ -45,7 +48,6 @@ async def seed_calls(db):
                 interruptions=random.randint(0, 5),
                 compliance_score=round(random.uniform(0, 100), 2),
                 audio_recording_url=fake.url(),
-                analysis_metadata=None,
             )
             records.append(record)
 
@@ -54,4 +56,4 @@ async def seed_calls(db):
         return records
 
     except Exception as e:
-        raise Exception(f"Error while seeding call_environment_factor: {e}") 
+        raise Exception(f"Error while seeding calls: {e}") 

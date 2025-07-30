@@ -28,4 +28,4 @@ async def seed_transcripts(db, calls, num_records=100):
         return records # return seeded transcripts for use in other seed files
 
     except Exception as e:
-        raise Exception(f"Error while seeding seed_transcripts: {e}") 
+        raise Exception(f"Error while seeding transcripts: {e}") 

@@ -31,4 +31,4 @@ async def seed_script_adherence(db, call_ids, product_ids):
         # commit will be handled in seed_all.py
 
     except Exception as e:
-        raise Exception(f"Error while seeding call_environment_factor: {e}") 
+        raise Exception(f"Error while seeding script_adherence: {e}") 

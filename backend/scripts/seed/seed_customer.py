@@ -20,4 +20,4 @@ async def seed_customers(db):
         return records
 
     except Exception as e:
-        raise Exception(f"Error while seeding call_environment_factor: {e}") 
+        raise Exception(f"Error while seeding customer: {e}") 

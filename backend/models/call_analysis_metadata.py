@@ -48,4 +48,4 @@ class CallAnalysisMetadata(Base):
     # call = relationship("Call", back_populates="analysis", uselist=False)
 
     # Relationships
-    call = relationship("Call", back_populates="analysis_metadata", uselist=False)
+    call = relationship("Call", back_populates="call_analysis_metadata", uselist=False)

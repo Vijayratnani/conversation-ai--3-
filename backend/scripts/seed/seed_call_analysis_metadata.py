@@ -5,11 +5,12 @@ from models.call_analysis_metadata import CallAnalysisMetadata  # adjust import 
 import random
 import asyncio
 
-async def seed_call_analysis_metadata(db):
+async def seed_call_analysis_metadata(db,calls_ids):
     try:
         records = []
-        for _ in range(NUM_CALLS_PER_AGENT):
+        for call_id in calls_ids:
             record = CallAnalysisMetadata(
+                call_id=call_id,
                 sentiment=random.choice(["positive", "neutral", "negative"]),
                 emotions=[random.choice(["happy", "angry", "sad", "surprised"]) for _ in range(random.randint(1,3))],
                 intent=[random.choice(["inquire", "complain", "purchase", "feedback"]) for _ in range(random.randint(1,3))],

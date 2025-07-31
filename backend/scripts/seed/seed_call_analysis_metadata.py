@@ -1,7 +1,7 @@
 # seed_call_analysis_metadata.py
 
 from .seed_config import fake, NUM_CALLS_PER_AGENT
-from models.call_analysis_metadata import CallAnalysisMetadata  # adjust import path accordingly
+from models.call_analysis_metadata import CallAnalysisMetadata 
 import random
 import asyncio
 

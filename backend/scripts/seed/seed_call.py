@@ -12,6 +12,7 @@ import asyncio
 async def seed_calls(db,agent_ids,customer_ids):
     try:
         records = []
+        
 
         # agent_ids = list(range(1, NUM_AGENTS + 1))
         # customer_ids = list(range(1, NUM_CUSTOMERS + 1))
@@ -20,9 +21,9 @@ async def seed_calls(db,agent_ids,customer_ids):
             call_time = fake.date_time_between(start_date='-1y', end_date='now')
             duration = random.randint(30, 3600)  # seconds between 30 sec and 1 hour
             direction = random.choice(['inbound', 'outbound'])
-            outcome = random.choice(['resolved', 'unresolved', 'escalated', 'no answer'])
-            customer_sentiment_choices = ['positive', 'neutral', 'negative', 'mixed']
-            agent_sentiment_choices = ['positive', 'neutral', 'negative', 'mixed']
+            outcome = random.choice(['Resolved', 'Dropped', 'Escalated'])
+            customer_sentiment_choices = ['Positive', 'Negative', 'Neutral']
+            agent_sentiment_choices = ['Empathetic', 'Frustrated', 'Professional']
             flagged = fake.boolean(chance_of_getting_true=10)
             sensitive_info = fake.boolean(chance_of_getting_true=5)
             transcript_available = fake.boolean(chance_of_getting_true=80)

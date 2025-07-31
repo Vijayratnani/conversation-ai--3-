@@ -5,6 +5,8 @@ import asyncio
 async def seed_products(db):
     try:
         records = []
+
+        
         for _ in range(NUM_PRODUCTS):
             record = Product(
                 name=fake.unique.word().title(),

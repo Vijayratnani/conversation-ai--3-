@@ -61,3 +61,19 @@ export interface CallMentionDetail {
   customerIdentifier: string
   mentionSnippet: string
 }
+
+export interface SentimentItem {
+  product: string;
+  positive: number;
+  neutral: number;
+  negative: number;
+  warning: boolean;
+  causes?: string[];
+}
+
+export interface SalesEffectivenessData {
+  conversionRate: number;
+  crossSellRate: number;
+  upsellRate: number;
+  trend: "up" | "down";
+}

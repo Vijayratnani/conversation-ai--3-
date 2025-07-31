@@ -1,3 +1,4 @@
+from models.customer import Customer
 import datetime
 import uuid
 from sqlalchemy import Column, String, Integer, CheckConstraint, Boolean, DateTime, ForeignKey, Text, Numeric

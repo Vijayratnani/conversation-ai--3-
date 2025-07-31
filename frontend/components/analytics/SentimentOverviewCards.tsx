@@ -4,7 +4,7 @@ import React from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 
-type SentimentItem = {
+export type SentimentItem = {
   product: string
   positive: number
   neutral: number
@@ -14,38 +14,13 @@ type SentimentItem = {
 }
 
 interface SentimentOverviewCardsProps {
+  sentimentData: SentimentItem[]
   setSelectedSentimentItem: (item: SentimentItem) => void
   setIsSentimentDetailDialogOpen: (open: boolean) => void
 }
 
-const sentimentData: SentimentItem[] = [
-  {
-    product: 'Credit Cards',
-    positive: 25,
-    neutral: 30,
-    negative: 45,
-    warning: true,
-    causes: ['Hidden fees', 'Interest rates', 'Customer service'],
-  },
-  {
-    product: 'Personal Loans',
-    positive: 40,
-    neutral: 35,
-    negative: 25,
-    warning: false,
-    causes: ['Application process', 'Approval time'],
-  },
-  {
-    product: 'Savings Accounts',
-    positive: 55,
-    neutral: 30,
-    negative: 15,
-    warning: false,
-    causes: ['Interest rates'],
-  },
-]
-
 const SentimentOverviewCards: React.FC<SentimentOverviewCardsProps> = ({
+  sentimentData,
   setSelectedSentimentItem,
   setIsSentimentDetailDialogOpen,
 }) => {

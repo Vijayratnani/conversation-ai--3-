@@ -32,6 +32,8 @@ import ProductStatDetailsContent from "@/components/analytics/ProductStatDetails
 import ScriptAdherenceDetailsContent from '@/components/analytics/ScriptAdherenceDetailsContent'
 import KnowledgeAssessmentDetails from '@/components/analytics/KnowledgeAssessmentDetails'
 import DashboardTabs from "@/components/dashboard/DashboardTabs"
+import { useSentimentData } from "@/hooks/useSentimentData"
+import { useSalesEffectiveness } from "@/hooks/useSalesEffectiveness"
 
 const iconMap: Record<string, React.ElementType> = {
   FileText,
@@ -81,6 +83,9 @@ export default function Dashboard() {
     fetchProductStats().then(setProductStats).catch(console.error)
   }, [])
 
+  const { sentimentData } = useSentimentData();
+  const { salesData } = useSalesEffectiveness();
+
   const handleKnowledgeItemClick = (item: ProductKnowledgeItem) => {
     setSelectedKnowledgeItem(item)
     setIsKnowledgeDetailDialogOpen(true)
@@ -112,6 +117,8 @@ export default function Dashboard() {
       </div>
       <DashboardTabs
         productStats={productStats}
+        sentimentData={sentimentData}
+        salesData={salesData}
         iconMap={iconMap}
         handleProductStatClick={handleProductStatClick}
         selectedSentimentItem={selectedSentimentItem}

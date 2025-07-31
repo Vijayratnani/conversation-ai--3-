@@ -9,13 +9,6 @@
 
 
 
-
-
-
-
-
-
-
 // components/dashboard/DashboardTabs.tsx
 import {
   Tabs,
@@ -63,6 +56,8 @@ import { ProductStatItem } from "@/types/dashboardTypes";
 export default function DashboardTabs({
   productStats,
   iconMap,
+  sentimentData,
+  salesData,
   handleProductStatClick,
   selectedSentimentItem,
   setSelectedSentimentItem,
@@ -196,6 +191,7 @@ export default function DashboardTabs({
                   </div>
 
                   <SentimentOverviewCards
+                    sentimentData={sentimentData}
                     setSelectedSentimentItem={setSelectedSentimentItem}
                     setIsSentimentDetailDialogOpen={setIsSentimentDetailDialogOpen}
                   />
@@ -247,7 +243,7 @@ export default function DashboardTabs({
                     )}
                   </DialogTitle>
                 </DialogHeader>
-                <SentimentAnalysisPanel selectedSentimentItem={selectedSentimentItem} />
+                <SentimentAnalysisPanel  selectedSentimentItem={selectedSentimentItem} />
               </DialogContent>
             </Dialog>
           )}
@@ -258,7 +254,7 @@ export default function DashboardTabs({
               <CardDescription>Performance metrics for sales and cross-selling opportunities</CardDescription>
             </CardHeader>
             <CardContent>
-              <SalesEffectivenessPanel />
+              <SalesEffectivenessPanel salesData={salesData}/>
             </CardContent>
           </Card>
         </div>

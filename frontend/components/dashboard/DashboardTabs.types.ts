@@ -1,5 +1,5 @@
 // components/dashboard/DashboardTabs.types.ts
-import { ProductStatItem, ProductKnowledgeItem, ScriptAdherenceItem, CallMentionDetail } from "@/types/dashboardTypes";
+import { ProductStatItem, ProductKnowledgeItem, ScriptAdherenceItem, CallMentionDetail, SalesEffectivenessData, SentimentItem } from "@/types/dashboardTypes";
 import type { LucideIcon } from "lucide-react";
 
 export type IconMap = {
@@ -8,6 +8,8 @@ export type IconMap = {
 
 export interface DashboardTabsProps {
   productStats: ProductStatItem[];
+  sentimentData: SentimentItem[];
+  salesData: SalesEffectivenessData;
   iconMap: IconMap;
   handleProductStatClick: (stat: ProductStatItem) => void;
   selectedSentimentItem: any; // replace `any` with your proper type if you have one

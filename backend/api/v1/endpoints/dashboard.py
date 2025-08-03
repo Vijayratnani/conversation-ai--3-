@@ -30,12 +30,22 @@ async def product_stats(db: AsyncSession = Depends(get_db)):
 
 # api/v1/routes/analytics.py
 
-from services.analytics import get_sentiment_analysis, get_sales_effectiveness
+from services.analytics import get_sentiment_analysis# , get_sales_effectiveness
 
 @router.get("/sentiment")
 async def sentiment_data(db: AsyncSession = Depends(get_db)):
     return await get_sentiment_analysis(db)
 
-@router.get("/sales-effectiveness")
-async def sales_data(db: AsyncSession = Depends(get_db)):
-    return await get_sales_effectiveness(db)
+from schemas.sales import SalesEffectivenessResponse
+from services.sales_analysis import analyze_sales_effectiveness
+
+@router.get("/sales-effectiveness", response_model=SalesEffectivenessResponse)
+async def get_sales_effectiveness(db: AsyncSession = Depends(get_db)):
+    return await analyze_sales_effectiveness(db)
+
+from schemas.strategic_insights import StrategicInsightsResponse
+from services.strategic_insights_service import get_strategic_insights_data
+
+@router.get("/strategic-insights", response_model=StrategicInsightsResponse)
+async def get_strategic_insights(db: AsyncSession = Depends(get_db)):
+    return await get_strategic_insights_data(db)

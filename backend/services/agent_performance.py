@@ -1,6 +1,7 @@
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from datetime import date, timedelta
+from decimal import Decimal
 from models.call import Call
 from models.script_adherence import ScriptAdherence
 from models.product_knowledge_score import ProductKnowledgeScore
@@ -18,18 +19,19 @@ def to_percent(n: float) -> str:
 
 async def get_agent_performance_data(db: AsyncSession) -> AgentPerformanceResponse:
     today = date.today()
-    first_day_this_month = today.replace(day=1)
-    first_day_last_month = (first_day_this_month - timedelta(days=1)).replace(day=1)
+    current_period_start = today - timedelta(days=30)
+    previous_period_start = today - timedelta(days=60)
+    previous_period_end = today - timedelta(days=30)
 
     # ────────────── 1. Avg. Call Quality ──────────────
     current_call_quality = (await db.execute(
-        select(func.avg(Call.compliance_score)).where(Call.call_timestamp >= first_day_this_month)
+        select(func.avg(Call.compliance_score)).where(Call.call_timestamp >= current_period_start)
     )).scalar() or 0
 
     previous_call_quality = (await db.execute(
         select(func.avg(Call.compliance_score)).where(
-            Call.call_timestamp >= first_day_last_month,
-            Call.call_timestamp < first_day_this_month
+            Call.call_timestamp >= previous_period_start,
+            Call.call_timestamp < previous_period_end
         )
     )).scalar() or 0
 
@@ -37,13 +39,13 @@ async def get_agent_performance_data(db: AsyncSession) -> AgentPerformanceRespon
 
     # ────────────── 2. Script Adherence ──────────────
     current_adherence = (await db.execute(
-        select(func.avg(ScriptAdherence.score)).where(ScriptAdherence.assessment_date >= first_day_this_month)
+        select(func.avg(ScriptAdherence.score)).where(ScriptAdherence.assessment_date >= current_period_start)
     )).scalar() or 0
 
     previous_adherence = (await db.execute(
         select(func.avg(ScriptAdherence.score)).where(
-            ScriptAdherence.assessment_date >= first_day_last_month,
-            ScriptAdherence.assessment_date < first_day_this_month
+            ScriptAdherence.assessment_date >= previous_period_start,
+            ScriptAdherence.assessment_date < previous_period_end
         )
     )).scalar() or 0
 
@@ -51,27 +53,27 @@ async def get_agent_performance_data(db: AsyncSession) -> AgentPerformanceRespon
 
     # ────────────── 3. Avg. Handle Time ──────────────
     current_duration = (await db.execute(
-        select(func.avg(Call.duration_seconds)).where(Call.call_timestamp >= first_day_this_month)
+        select(func.avg(Call.duration_seconds)).where(Call.call_timestamp >= current_period_start)
     )).scalar() or 0
 
     previous_duration = (await db.execute(
         select(func.avg(Call.duration_seconds)).where(
-            Call.call_timestamp >= first_day_last_month,
-            Call.call_timestamp < first_day_this_month
+            Call.call_timestamp >= previous_period_start,
+            Call.call_timestamp < previous_period_end
         )
     )).scalar() or 0
 
     duration_change = current_duration - previous_duration
 
-    # ────────────── 4. Customer Satisfaction (using compliance_score as proxy) ──────────────
+    # ────────────── 4. Customer Satisfaction ──────────────
     current_satisfaction = (await db.execute(
-        select(func.avg(Call.compliance_score)).where(Call.call_timestamp >= first_day_this_month)
+        select(func.avg(Call.compliance_score)).where(Call.call_timestamp >= current_period_start)
     )).scalar() or 0
 
     previous_satisfaction = (await db.execute(
         select(func.avg(Call.compliance_score)).where(
-            Call.call_timestamp >= first_day_last_month,
-            Call.call_timestamp < first_day_this_month
+            Call.call_timestamp >= previous_period_start,
+            Call.call_timestamp < previous_period_end
         )
     )).scalar() or 0
 
@@ -100,7 +102,7 @@ async def get_agent_performance_data(db: AsyncSession) -> AgentPerformanceRespon
         AgentStat(
             title="Customer Satisfaction",
             value=f"{round(current_satisfaction, 1)}/5",
-            change=f"{'+' if satisfaction_change >= 0 else ''}{round(satisfaction_change, 1)} from last month",
+            change=f"{'+' if satisfaction_change >= 0 else ''}{round(satisfaction_change, 1)} from last period",
             trend="up" if satisfaction_change >= 0 else "down",
         ),
     ]
@@ -112,7 +114,7 @@ async def get_agent_performance_data(db: AsyncSession) -> AgentPerformanceRespon
             func.count().filter(ProductKnowledgeScore.score.between(75, 89.99)),
             func.count().filter(ProductKnowledgeScore.score < 75),
             func.avg(ProductKnowledgeScore.score),
-        ).where(ProductKnowledgeScore.assessment_date >= first_day_this_month)
+        ).where(ProductKnowledgeScore.assessment_date >= current_period_start)
     )
     row = knowledge_q.fetchone()
     excellent, good, needs_improvement, avg_score = row if row else (0, 0, 0, 0)
@@ -124,13 +126,13 @@ async def get_agent_performance_data(db: AsyncSession) -> AgentPerformanceRespon
             func.count().filter(ProductKnowledgeScore.score < 75),
             func.avg(ProductKnowledgeScore.score),
         ).where(
-            ProductKnowledgeScore.assessment_date >= first_day_last_month,
-            ProductKnowledgeScore.assessment_date < first_day_this_month
+            ProductKnowledgeScore.assessment_date >= previous_period_start,
+            ProductKnowledgeScore.assessment_date < previous_period_end
         )
     )
     prev_row = previous_knowledge_q.fetchone()
     prev_excellent, prev_good, prev_needs_improvement, prev_avg_score = prev_row if prev_row else (0, 0, 0, 0)
-    avg_score_trend = avg_score - (prev_avg_score or 0)
+    avg_score_trend = (avg_score or Decimal("0.0")) - (prev_avg_score or Decimal("0.0"))
     trend_str = f"{'+' if avg_score_trend >= 0 else ''}{round(avg_score_trend, 1)}%"
 
     knowledge_distribution = KnowledgeDistribution(
@@ -154,7 +156,7 @@ async def get_agent_performance_data(db: AsyncSession) -> AgentPerformanceRespon
             Product.product_id
         ).join(ProductKnowledgeScore, ProductKnowledgeScore.agent_id == Agent.agent_id)
         .join(Product, Product.product_id == ProductKnowledgeScore.product_id)
-        .where(ProductKnowledgeScore.assessment_date >= first_day_this_month)
+        .where(ProductKnowledgeScore.assessment_date >= current_period_start)
         .order_by(ProductKnowledgeScore.score.desc())
         .limit(3)
     )
@@ -166,8 +168,8 @@ async def get_agent_performance_data(db: AsyncSession) -> AgentPerformanceRespon
             select(ProductKnowledgeScore.score).where(
                 ProductKnowledgeScore.agent_id == row.agent_id,
                 ProductKnowledgeScore.product_id == row.product_id,
-                ProductKnowledgeScore.assessment_date >= first_day_last_month,
-                ProductKnowledgeScore.assessment_date < first_day_this_month,
+                ProductKnowledgeScore.assessment_date >= previous_period_start,
+                ProductKnowledgeScore.assessment_date < previous_period_end,
             ).order_by(ProductKnowledgeScore.assessment_date.desc()).limit(1)
         )
         last_score = last_score_q.scalar()

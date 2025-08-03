@@ -36,6 +36,7 @@ class Call(Base):
     interruptions = Column(Integer)
     compliance_score = Column(Numeric(5, 2))
     audio_recording_url = Column(Text)
+    hold_time_seconds = Column(Integer, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     # Relationships

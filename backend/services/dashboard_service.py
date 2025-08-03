@@ -2,27 +2,22 @@ from sqlalchemy import select, func, text
 from sqlalchemy.ext.asyncio import AsyncSession
 from models.product import Product
 from models.call_analysis_metadata import CallAnalysisMetadata
-from datetime import date
-from dateutil.relativedelta import relativedelta
-
+from datetime import date, timedelta
 
 async def get_dashboard_product_stats(db: AsyncSession):
     today = date.today()
-    start_of_this_month = today.replace(day=1)
-    start_of_last_month = start_of_this_month - relativedelta(months=1)
-    end_of_last_month = start_of_this_month - relativedelta(days=1)
+    start_30_days_ago = today - timedelta(days=30)
 
-    # Total complaints this month (used for share%)
+    # Total complaints in last 30 days
     total_complaints_result = await db.execute(
         select(func.count())
         .select_from(CallAnalysisMetadata)
         .filter(
             CallAnalysisMetadata.intent.contains(['complaint']),
-            CallAnalysisMetadata.created_at >= start_of_this_month,
-            CallAnalysisMetadata.created_at < today,
+            CallAnalysisMetadata.created_at >= start_30_days_ago
         )
     )
-    total_complaints = total_complaints_result.scalar() or 1  # avoid division by 0
+    total_complaints = total_complaints_result.scalar() or 1  # prevent division by 0
 
     # Get all products
     products_result = await db.execute(select(Product))
@@ -33,75 +28,76 @@ async def get_dashboard_product_stats(db: AsyncSession):
     for product in products:
         product_name = product.name
 
-        # Complaint count for current month
+        # Complaint count in last 30 days
         current_stmt = text("""
-            SELECT COUNT(*) FROM call_analysis_metadata,
+            SELECT COUNT(*) FROM call_analysis_metadata cam,
             LATERAL jsonb_array_elements(
                 CASE 
-                    WHEN jsonb_typeof(product_mentions) = 'array' 
-                    THEN product_mentions 
+                    WHEN jsonb_typeof(cam.product_mentions) = 'array' 
+                    THEN cam.product_mentions 
                     ELSE '[]'::jsonb 
                 END
             ) AS pm
-            WHERE pm->>'product' = :product_name
+            WHERE LOWER(pm->>'product') = LOWER(:product_name)
               AND (pm->>'issue_detected')::boolean = true
-              AND 'complaint' = ANY(intent)
-              AND created_at >= :start_date AND created_at < :end_date
+              AND 'complaint' = ANY(cam.intent)
+              AND cam.created_at >= :start_date
         """)
         current_result = await db.execute(
             current_stmt,
             {
                 "product_name": product_name,
-                "start_date": start_of_this_month,
-                "end_date": today
+                "start_date": start_30_days_ago,
             }
         )
         current_count = current_result.scalar() or 0
 
-        # Complaint count for last month
+        # Complaint count in the previous 30–60 day window (for trend)
+        last_period_start = start_30_days_ago - timedelta(days=30)
+        last_period_end = start_30_days_ago
+
         last_stmt = text("""
-            SELECT COUNT(*) FROM call_analysis_metadata,
+            SELECT COUNT(*) FROM call_analysis_metadata cam,
             LATERAL jsonb_array_elements(
                 CASE 
-                    WHEN jsonb_typeof(product_mentions) = 'array' 
-                    THEN product_mentions 
+                    WHEN jsonb_typeof(cam.product_mentions) = 'array' 
+                    THEN cam.product_mentions 
                     ELSE '[]'::jsonb 
                 END
             ) AS pm
-            WHERE pm->>'product' = :product_name
+            WHERE LOWER(pm->>'product') = LOWER(:product_name)
               AND (pm->>'issue_detected')::boolean = true
-              AND 'complaint' = ANY(intent)
-              AND created_at >= :start_date AND created_at <= :end_date
+              AND 'complaint' = ANY(cam.intent)
+              AND cam.created_at >= :start_date AND cam.created_at < :end_date
         """)
         last_result = await db.execute(
             last_stmt,
             {
                 "product_name": product_name,
-                "start_date": start_of_last_month,
-                "end_date": end_of_last_month
+                "start_date": last_period_start,
+                "end_date": last_period_end
             }
         )
         last_count = last_result.scalar() or 0
 
-        # Share % and trend %
         share_percent = round((current_count / total_complaints) * 100, 1)
         change_percent = round(((current_count - last_count) / last_count) * 100, 1) if last_count else 0.0
 
-        # Top issue keyword this month
+        # Top keyword this month
         top_issue_stmt = text("""
-            SELECT kw AS keyword, COUNT(*) FROM call_analysis_metadata,
+            SELECT kw AS keyword, COUNT(*) FROM call_analysis_metadata cam,
             LATERAL jsonb_array_elements(
                 CASE 
-                    WHEN jsonb_typeof(product_mentions) = 'array' 
-                    THEN product_mentions 
+                    WHEN jsonb_typeof(cam.product_mentions) = 'array' 
+                    THEN cam.product_mentions 
                     ELSE '[]'::jsonb 
                 END
             ) AS pm,
             LATERAL jsonb_array_elements_text(pm->'problem_keywords') AS kw
-            WHERE pm->>'product' = :product_name
+            WHERE LOWER(pm->>'product') = LOWER(:product_name)
               AND (pm->>'issue_detected')::boolean = true
-              AND 'complaint' = ANY(intent)
-              AND created_at >= :start_date AND created_at < :end_date
+              AND 'complaint' = ANY(cam.intent)
+              AND cam.created_at >= :start_date
             GROUP BY keyword
             ORDER BY COUNT(*) DESC
             LIMIT 1
@@ -110,8 +106,7 @@ async def get_dashboard_product_stats(db: AsyncSession):
             top_issue_stmt,
             {
                 "product_name": product_name,
-                "start_date": start_of_this_month,
-                "end_date": today
+                "start_date": start_30_days_ago,
             }
         )
         top_issue_row = top_issue_result.first()
@@ -125,6 +120,6 @@ async def get_dashboard_product_stats(db: AsyncSession):
             "top_issue": top_issue
         })
 
-    # ✅ Sort by share percentage (value) descending and return top 5
+    # Sort by value (share %) descending
     top_5 = sorted(result, key=lambda x: x["value"], reverse=True)[:5]
     return top_5

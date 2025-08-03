@@ -1,10 +1,14 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, desc
 from models import CallTopic, Topic, CallEnvironmentFactor, CallAnalysisMetadata
-from models import Agent, Call
+from models import Agent, Call, ProductKnowledgeScore
 from schemas.strategic_insights import GrowthOpportunity
 from typing import List
+from datetime import datetime, timedelta, timezone
 
+now = datetime.now(timezone.utc)
+last_30_days = now - timedelta(days=30)
+last_60_days = now - timedelta(days=60)
 
 async def get_strategic_insights_data(db: AsyncSession) -> dict:
     # ========== 1. Growth Opportunities ==========
@@ -71,20 +75,91 @@ async def get_strategic_insights_data(db: AsyncSession) -> dict:
     needs_coaching_count = len(low_performers_result.all())
 
     # ========== 3. Risk Indicators ==========
-    risk_indicators = [
-        {
-            "title": "Compliance Risk",
-            "description": "Disclosure phrase missing in 18% of calls",
-            "trend": "↑ 4% from last month",
-            "color": "text-red-600",
-        },
-        {
-            "title": "Customer Churn Risk",
-            "description": "Competitor mentions up 12%",
-            "trend": "High risk in Credit Cards",
-            "color": "text-amber-600",
-        },
-    ]
+    from sqlalchemy import case
+
+    risk_indicators = []
+    # Current month low compliance calls
+    low_compliance_this_month = (
+        select(func.count())
+        .select_from(Call)
+        .where(Call.call_timestamp >= last_30_days)
+        .where(Call.compliance_score < 0.6)
+    )
+    total_calls_this_month = (
+        select(func.count())
+        .select_from(Call)
+        .where(Call.call_timestamp >= last_30_days)
+    )
+
+    # Last month low compliance calls
+    low_compliance_last_month = (
+        select(func.count())
+        .select_from(Call)
+        .where(Call.call_timestamp >= last_60_days)
+        .where(Call.call_timestamp < last_30_days)
+        .where(Call.compliance_score < 0.6)
+    )
+    total_calls_last_month = (
+        select(func.count())
+        .select_from(Call)
+        .where(Call.call_timestamp >= last_60_days)
+        .where(Call.call_timestamp < last_30_days)
+    )
+
+    low_this = (await db.execute(low_compliance_this_month)).scalar() or 0
+    total_this = (await db.execute(total_calls_this_month)).scalar() or 1
+    low_last = (await db.execute(low_compliance_last_month)).scalar() or 0
+    total_last = (await db.execute(total_calls_last_month)).scalar() or 1
+
+    rate_this = round(100 * low_this / total_this, 1)
+    rate_last = round(100 * low_last / total_last, 1)
+    diff = round(rate_this - rate_last, 1)
+
+    risk_indicators.append({
+        "title": "Compliance Risk",
+        "description": f"{rate_this}% of calls scored < 0.6",
+        "trend": f"{'↑' if diff > 0 else '↓'} {abs(diff)}% from last month",
+        "color": "text-red-600" if rate_this > 15 else "text-yellow-600" if rate_this > 8 else "text-green-600",
+    })
+
+    churn_this_month = (
+        select(func.count())
+        .select_from(CallAnalysisMetadata)
+        .where(CallAnalysisMetadata.created_at >= last_30_days)
+        .where(CallAnalysisMetadata.churn_risk == "high")
+    )
+    total_churn_checks = (
+        select(func.count())
+        .select_from(CallAnalysisMetadata)
+        .where(CallAnalysisMetadata.created_at >= last_30_days)
+    )
+
+    churn_count = (await db.execute(churn_this_month)).scalar() or 0
+    churn_total = (await db.execute(total_churn_checks)).scalar() or 1
+    churn_percent = round(100 * churn_count / churn_total, 1)
+
+    risk_indicators.append({
+    "title": "Customer Churn Risk",
+    "description": f"{churn_percent}% high-risk interactions",
+    "trend": "More churn signs in recent calls" if churn_percent > 10 else "Stable churn signals",
+    "color": "text-amber-600" if churn_percent > 10 else "text-green-600"
+    })
+
+    low_knowledge_query = (
+        select(func.count())
+        .select_from(ProductKnowledgeScore)
+        .where(ProductKnowledgeScore.assessment_date >= last_30_days)
+        .where(ProductKnowledgeScore.score < 50)
+    )
+    low_knowledge_count = (await db.execute(low_knowledge_query)).scalar() or 0
+
+    risk_indicators.append({
+    "title": "Knowledge Gap Risk",
+    "description": f"{low_knowledge_count} low scores this month",
+    "trend": "Product training needed" if low_knowledge_count > 10 else "Improving scores",
+    "color": "text-red-500" if low_knowledge_count > 15 else "text-yellow-600" if low_knowledge_count > 5 else "text-green-600"
+    })
+
 
     # ========== 4. Call Environment Stats ==========
     env_query = (

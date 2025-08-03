@@ -1,5 +1,12 @@
-// components/dashboard/DashboardTabs.types.ts
-import { ProductStatItem, ProductKnowledgeItem, ScriptAdherenceItem, CallMentionDetail, SalesEffectivenessData, SentimentItem } from "@/types/dashboardTypes";
+import {
+  ProductStatItem,
+  ProductKnowledgeItem,
+  ScriptAdherenceItem,
+  CallMentionDetail,
+  SalesEffectivenessData,
+  SentimentItem,
+  StrategicInsightsData,
+} from "@/types/dashboardTypes";
 import type { LucideIcon } from "lucide-react";
 
 export type IconMap = {
@@ -16,7 +23,8 @@ export interface DashboardTabsProps {
   setSelectedSentimentItem: (item: any) => void;
   isSentimentDetailDialogOpen: boolean;
   setIsSentimentDetailDialogOpen: (val: boolean) => void;
-  growthOpportunities: any[];
+
+  strategicData: StrategicInsightsData;
   mockMentionsData: Record<string, string[]>;
   togglePlay: (audioType: string) => void;
   playingAudio: string | null;
@@ -26,6 +34,7 @@ export interface DashboardTabsProps {
   isGrowthOpportunityDetailDialogOpen: boolean;
   setIsGrowthOpportunityDetailDialogOpen: (val: boolean) => void;
   selectedGrowthOpportunityTopic: string;
+
   productKnowledgeLevels: ProductKnowledgeItem[];
   scriptAdherenceData: ScriptAdherenceItem[];
   handleKnowledgeItemClick: (item: ProductKnowledgeItem) => void;

@@ -58,12 +58,12 @@ export default function DashboardTabs({
   iconMap,
   sentimentData,
   salesData,
+  strategicData,
   handleProductStatClick,
   selectedSentimentItem,
   setSelectedSentimentItem,
   isSentimentDetailDialogOpen,
   setIsSentimentDetailDialogOpen,
-  growthOpportunities,
   mockMentionsData,
   togglePlay,
   playingAudio,
@@ -80,6 +80,7 @@ export default function DashboardTabs({
 }: DashboardTabsProps) {
   return (
     <Tabs defaultValue="overview" className="space-y-6">
+      {/* Tabs List */}
       <TabsList className="bg-white/80 p-1 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 backdrop-blur-sm">
         <TabsTrigger value="overview" className="rounded-lg text-sm font-medium">
           Overview
@@ -96,7 +97,7 @@ export default function DashboardTabs({
         {/* Product Stats Cards */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-5">
           {productStats.map((stat: ProductStatItem) => {
-            const Icon = (iconMap?.[stat.iconName] ?? FileText);
+            const Icon = iconMap?.[stat.iconName] ?? FileText;
             return (
               <Card
                 key={stat.id}
@@ -110,9 +111,7 @@ export default function DashboardTabs({
                 aria-haspopup="dialog"
                 aria-labelledby={`stat-title-${stat.id}`}
               >
-                <CardHeader
-                  className={`flex flex-row items-center justify-between space-y-0 pb-2 ${stat.headerClass}`}
-                >
+                <CardHeader className={`flex flex-row items-center justify-between space-y-0 pb-2 ${stat.headerClass}`}>
                   <CardTitle id={`stat-title-${stat.id}`} className="text-sm font-medium">
                     {stat.title}
                   </CardTitle>
@@ -139,7 +138,7 @@ export default function DashboardTabs({
           })}
         </div>
 
-        {/* Agent KPIs Dashboard */}
+        {/* Agent KPIs */}
         <Card className="card-enhanced glass-effect overflow-hidden border-0 shadow-soft-lg">
           <CardHeader className="pb-2 bg-gradient-to-r from-primary-50 to-primary-100/50 dark:from-primary-900/20 dark:to-primary-800/10 border-b border-primary/10">
             <div className="flex items-center justify-between">
@@ -171,22 +170,13 @@ export default function DashboardTabs({
             <CardContent className="p-0">
               <div className="rounded-md flex flex-col items-center justify-center bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm">
                 <div className="w-full h-full p-6 space-y-4">
+                  {/* Sentiment Tags */}
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-6 bg-white/80 py-2 px-4 rounded-lg shadow-sm backdrop-blur-sm">
-                      <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 bg-green-500 rounded-full shadow-sm"></div>
-                        <span className="font-medium text-xs">Positive</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 bg-gray-300 rounded-full shadow-sm"></div>
-                        <span className="font-medium text-xs">Neutral</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 bg-red-500 rounded-full shadow-sm"></div>
-                        <span className="font-medium text-xs">Negative</span>
-                      </div>
+                      <div className="flex items-center gap-2"><div className="w-3 h-3 bg-green-500 rounded-full shadow-sm"></div><span className="font-medium text-xs">Positive</span></div>
+                      <div className="flex items-center gap-2"><div className="w-3 h-3 bg-gray-300 rounded-full shadow-sm"></div><span className="font-medium text-xs">Neutral</span></div>
+                      <div className="flex items-center gap-2"><div className="w-3 h-3 bg-red-500 rounded-full shadow-sm"></div><span className="font-medium text-xs">Negative</span></div>
                     </div>
-
                     <div className="text-xs text-muted-foreground bg-muted/30 py-1 px-2 rounded-md">Last 30 days</div>
                   </div>
 
@@ -218,9 +208,7 @@ export default function DashboardTabs({
                         </Button>
                       </DialogTrigger>
                       <DialogContent className="sm:max-w-[800px]">
-                        <DialogHeader>
-                          <DialogTitle>Complete Sentiment Analysis</DialogTitle>
-                        </DialogHeader>
+                        <DialogHeader><DialogTitle>Complete Sentiment Analysis</DialogTitle></DialogHeader>
                         <ProductSentimentList />
                       </DialogContent>
                     </Dialog>
@@ -243,7 +231,7 @@ export default function DashboardTabs({
                     )}
                   </DialogTitle>
                 </DialogHeader>
-                <SentimentAnalysisPanel  selectedSentimentItem={selectedSentimentItem} />
+                <SentimentAnalysisPanel selectedSentimentItem={selectedSentimentItem} />
               </DialogContent>
             </Dialog>
           )}
@@ -254,12 +242,12 @@ export default function DashboardTabs({
               <CardDescription>Performance metrics for sales and cross-selling opportunities</CardDescription>
             </CardHeader>
             <CardContent>
-              <SalesEffectivenessPanel salesData={salesData}/>
+              <SalesEffectivenessPanel salesData={salesData} />
             </CardContent>
           </Card>
         </div>
 
-        {/* Strategic Insights Dashboard */}
+        {/* Strategic Insights Panel */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-8 mt-6">
           <Card className="col-span-8 overflow-hidden bg-white dark:bg-gray-900 border-0 shadow-lg transition-all duration-300 hover:shadow-xl">
             <CardHeader className="bg-gradient-to-r from-indigo-50 to-indigo-100/50 dark:from-indigo-900/20 dark:to-indigo-800/10 border-b border-indigo-100/50">
@@ -270,7 +258,11 @@ export default function DashboardTabs({
             </CardHeader>
             <CardContent>
               <StrategicInsightsPanel
-                growthOpportunities={growthOpportunities}
+                growthOpportunities={strategicData.growthOpportunities}
+                riskIndicators={strategicData.riskIndicators}
+                agentPerformance={strategicData.agentPerformance}
+                avgHoldTimeStats= {strategicData.avgHoldTimeStats}
+                callEnvironmentStats={strategicData.callEnvironmentStats}
                 mockMentionsData={mockMentionsData}
                 togglePlay={togglePlay}
                 playingAudio={playingAudio}

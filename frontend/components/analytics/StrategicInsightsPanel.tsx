@@ -11,8 +11,39 @@ interface GrowthOpportunity {
   mentions: number
 }
 
+interface RiskIndicator {
+  title: string
+  description: string
+  trend: string
+  color: string
+}
+
+interface AgentPerformance {
+  avgScore: number
+  topAgent: {
+    name: string
+    score: number
+  }
+  needsCoachingCount: number
+}
+
+interface CallEnvironmentStat {
+  type: string
+  label: string
+  detail: string
+}
+interface AvgHoldTimeStats {
+  currentAvgHoldTime: string // e.g., "1m 42s"
+  diffFromLastMonth: string  // e.g., "↓ 12s"
+  isImproved: boolean        // for green/red text styling
+}
+
 interface StrategicInsightsPanelProps {
   growthOpportunities: GrowthOpportunity[]
+  riskIndicators: RiskIndicator[]
+  agentPerformance: AgentPerformance
+  callEnvironmentStats: CallEnvironmentStat[]
+  avgHoldTimeStats: AvgHoldTimeStats
   mockMentionsData: Record<string, string[]>
   togglePlay: (audioType: string) => void
   playingAudio: string | null
@@ -26,6 +57,10 @@ interface StrategicInsightsPanelProps {
 
 const StrategicInsightsPanel: React.FC<StrategicInsightsPanelProps> = ({
   growthOpportunities,
+  riskIndicators,
+  agentPerformance,
+  callEnvironmentStats,
+  avgHoldTimeStats,
   mockMentionsData,
   togglePlay,
   playingAudio,
@@ -43,20 +78,21 @@ const StrategicInsightsPanel: React.FC<StrategicInsightsPanelProps> = ({
         <div className="flex items-center justify-between mb-2">
           <h4 className="text-sm font-medium">Risk Indicators</h4>
           <Badge variant="outline" className="bg-red-50 text-red-600 border-red-200 dark:bg-red-900/20 dark:text-red-400">
-            3 High Priority
+            {riskIndicators.length} High Priority
           </Badge>
         </div>
         <div className="grid grid-cols-2 gap-2 mt-2">
-          <div className="bg-muted/30 p-2 rounded-md border-l-2 border-red-500">
-            <div className="text-sm font-medium">Compliance Risk</div>
-            <div className="text-xs text-muted-foreground">Disclosure phrase missing in 18% of calls</div>
-            <div className="text-xs font-medium text-red-600 mt-1">↑ 4% from last month</div>
-          </div>
-          <div className="bg-muted/30 p-2 rounded-md border-l-2 border-amber-500">
-            <div className="text-sm font-medium">Customer Churn Risk</div>
-            <div className="text-xs text-muted-foreground">Competitor mentions up 12%</div>
-            <div className="text-xs font-medium text-amber-600 mt-1">High risk in Credit Cards</div>
-          </div>
+          {riskIndicators.map((risk, idx) => (
+            <div
+              key={idx}
+              className="bg-muted/30 p-2 rounded-md border-l-2"
+              style={{ borderColor: risk.color.includes("red") ? "#ef4444" : "#f59e0b" }}
+            >
+              <div className="text-sm font-medium">{risk.title}</div>
+              <div className="text-xs text-muted-foreground">{risk.description}</div>
+              <div className={`text-xs font-medium mt-1 ${risk.color}`}>{risk.trend}</div>
+            </div>
+          ))}
         </div>
       </div>
 
@@ -64,14 +100,21 @@ const StrategicInsightsPanel: React.FC<StrategicInsightsPanelProps> = ({
       <div>
         <div className="flex items-center justify-between mb-2">
           <h4 className="text-sm font-medium">Agent Performance</h4>
-          <div className="text-sm font-medium text-primary">78% Avg. Quality Score</div>
+          <div className="text-sm font-medium text-primary">
+            {agentPerformance.avgScore}% Avg. Quality Score
+          </div>
         </div>
         <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
-          <div className="h-full bg-primary rounded-full" style={{ width: '78%' }}></div>
+          <div
+            className="h-full bg-primary rounded-full"
+            style={{ width: `${agentPerformance.avgScore}%` }}
+          ></div>
         </div>
         <div className="flex justify-between text-xs text-muted-foreground mt-1">
-          <span>Top agent: Sarah K. (94%)</span>
-          <span>Needs coaching: 3 agents</span>
+          <span>
+            Top agent: {agentPerformance.topAgent.name} ({agentPerformance.topAgent.score}%)
+          </span>
+          <span>Needs coaching: {agentPerformance.needsCoachingCount} agents</span>
         </div>
       </div>
 
@@ -80,12 +123,12 @@ const StrategicInsightsPanel: React.FC<StrategicInsightsPanelProps> = ({
         <div className="flex items-center justify-between mb-2">
           <h4 className="text-sm font-medium">Growth Opportunities</h4>
           <Badge variant="outline" className="bg-green-50 text-green-600 border-green-200 dark:bg-green-900/20 dark:text-green-400">
-            4 Identified
+            {growthOpportunities.length} Identified
           </Badge>
         </div>
         <div className="bg-muted/30 p-3 rounded-md">
           <div className="space-y-2">
-            {(growthOpportunities ?? []).map((item) => (
+            {growthOpportunities.map((item) => (
               <div key={item.id} className="flex items-center justify-between text-xs">
                 <span className="font-medium">{item.topic}</span>
                 <Button
@@ -115,18 +158,7 @@ const StrategicInsightsPanel: React.FC<StrategicInsightsPanelProps> = ({
           <h4 className="text-sm font-medium">Call Environment Analysis</h4>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-          {[
-            {
-              label: 'Dog Barking',
-              detail: 'Detected in 8% of calls',
-              type: 'dog-barking',
-            },
-            {
-              label: 'Cafe Chatter',
-              detail: 'Detected in 6% of calls',
-              type: 'cafe-chatter',
-            },
-          ].map((noise) => (
+          {callEnvironmentStats.map((noise) => (
             <div
               key={noise.type}
               className="bg-muted/30 p-3 rounded-md text-center flex flex-col justify-between"
@@ -147,14 +179,24 @@ const StrategicInsightsPanel: React.FC<StrategicInsightsPanelProps> = ({
               </div>
             </div>
           ))}
-
-          <div className="bg-muted/30 p-3 rounded-md text-center flex flex-col justify-between">
-            <div>
-              <div className="text-xs text-muted-foreground">Avg. Hold Time</div>
-              <div className="text-sm font-medium mt-1">1m 42s</div>
+          {avgHoldTimeStats && (
+            <div className="bg-muted/30 p-3 rounded-md text-center flex flex-col justify-between">
+              <div>
+                <div className="text-xs text-muted-foreground">Avg. Hold Time</div>
+                <div className="text-sm font-medium mt-1">
+                  {avgHoldTimeStats.currentAvgHoldTime}
+                </div>
+              </div>
+              <div
+                className={`text-xs mt-2 ${avgHoldTimeStats.isImproved ? 'text-green-600' : 'text-red-600'
+                  }`}
+              >
+                {avgHoldTimeStats.diffFromLastMonth} from last month
+              </div>
             </div>
-            <div className="text-xs text-green-600 mt-2">↓ 12s from last month</div>
-          </div>
+          )}
+
+
         </div>
       </div>
     </div>

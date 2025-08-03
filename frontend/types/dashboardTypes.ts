@@ -77,3 +77,30 @@ export interface SalesEffectivenessData {
   upsellRate: number;
   trend: "up" | "down";
 }
+
+export interface GrowthOpportunity {
+  id: string;
+  topic: string;
+  topicUrdu: string;
+  mentions: number;
+}
+
+export interface RiskIndicator {
+  title: string;
+  description: string;
+  trend: string;
+  color: string;
+}
+
+export interface CallEnvironmentStat {
+  type: string;
+  label: string;
+  detail: string;
+}
+
+export interface StrategicInsightsData {
+  growthOpportunities: GrowthOpportunity[];
+  agentAvgScore: number;
+  riskIndicators: RiskIndicator[];
+  callEnvironmentStats: CallEnvironmentStat[];
+}

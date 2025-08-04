@@ -103,7 +103,7 @@ async def main():
  
             try:
                 print("🌱 Seeding Call Analysis Metadata...")
-                call_analysis = await seed_call_analysis_metadata2(session,call_ids)
+                call_analysis = await seed_call_analysis_metadata(session,call_ids)
                 await session.commit()
                 print(f"✅ Seeded {len(call_analysis)} call analysis metadata records.")
             except Exception as e:

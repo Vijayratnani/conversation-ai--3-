@@ -28,3 +28,4 @@ class AgentPerformanceResponse(BaseModel):
     agent_stats: List[AgentStat]
     knowledge_distribution: KnowledgeDistribution
     top_agents: List[TopAgent]
+    agent_count: int

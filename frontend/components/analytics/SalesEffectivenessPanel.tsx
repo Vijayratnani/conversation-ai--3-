@@ -8,12 +8,12 @@ type SalesData = {
   totalCalls: number
   crossSellSuccessPercent: number
   topCrossSell: {
-    from: string
+    from_: string
     to: string
     successPercent: number
   }
   lowestCrossSell: {
-    from: string
+    from_: string
     to: string
     successPercent: number
   }
@@ -67,7 +67,7 @@ const SalesEffectivenessPanel: React.FC<SalesEffectivenessPanelProps> = ({ sales
           <div className="bg-muted/30 p-2 rounded-md">
             <div className="text-sm font-medium">Top Cross-Sell</div>
             <div className="text-xs text-muted-foreground">
-              {salesData?.topCrossSell.from} → {salesData?.topCrossSell.to}
+              {salesData?.topCrossSell.from_} → {salesData?.topCrossSell.to}
             </div>
             <div className="text-xs font-medium text-green-600 mt-1">
               {salesData?.topCrossSell.successPercent}% success
@@ -76,7 +76,7 @@ const SalesEffectivenessPanel: React.FC<SalesEffectivenessPanelProps> = ({ sales
           <div className="bg-muted/30 p-2 rounded-md">
             <div className="text-sm font-medium">Lowest Cross-Sell</div>
             <div className="text-xs text-muted-foreground">
-              {salesData?.lowestCrossSell.from} → {salesData?.lowestCrossSell.to}
+              {salesData?.lowestCrossSell.from_} → {salesData?.lowestCrossSell.to}
             </div>
             <div className="text-xs font-medium text-red-600 mt-1">
               {salesData?.lowestCrossSell.successPercent}% success

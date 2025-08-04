@@ -55,10 +55,14 @@ const mockSentimentData: ProductSentiment[] = [
   },
 ]
 
-const ProductSentimentList: React.FC = () => {
+interface Props {
+  sentimentData: ProductSentiment[];
+}
+
+const ProductSentimentList: React.FC<Props> = ({ sentimentData }) => {
   return (
     <div className="space-y-4 mt-2 max-h-[70vh] overflow-y-auto pr-2">
-      {mockSentimentData.map((item) => (
+      {sentimentData.map((item) => (
         <div
           key={item.product}
           className="space-y-2 bg-white dark:bg-muted/20 p-4 rounded-lg border-l-4 border-l-primary shadow-sm"

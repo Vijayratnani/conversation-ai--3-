@@ -31,10 +31,14 @@ const focusedSentimentData: SentimentItem[] = [
   },
 ]
 
-const FocusedSentimentBreakdown: React.FC = () => {
+interface Props {
+  sentimentData: SentimentItem[];
+}
+
+const FocusedSentimentBreakdown: React.FC<Props> = ({ sentimentData }) => {
   return (
     <div className="space-y-4 mt-2">
-      {focusedSentimentData.map((item) => (
+      {sentimentData.slice(3).map((item) => (
         <div
           key={item.product}
           className="bg-white dark:bg-muted/20 p-3 rounded-lg border-l-4 border-l-primary shadow-sm"

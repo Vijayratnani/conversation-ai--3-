@@ -1,7 +1,5 @@
 "use client"
 
-// import { DashboardTabsProps } from "@/components/dashboard/DashboardTabs.types";
-
 import { useEffect, useState, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/components/auth-provider"
@@ -54,6 +52,7 @@ import { useAudioManager } from "@/hooks/useAudioManager"
 import { useSentimentData } from "@/hooks/useSentimentData"
 import { useSalesEffectiveness } from "@/hooks/useSalesEffectiveness"
 import { useStrategicInsights } from "@/hooks/useStrategicInsights"
+import { useGrowthOpportunities } from "@/hooks/useGrowthOpportunities"
 
 import {
   // growthOpportunities,
@@ -62,7 +61,7 @@ import {
   // scriptAdherenceData,
   fetchProductStats
 } from "@/constants/fetchProductStatsData"
-import { growthOpportunities } from "@/constants/growthData"
+// import { growthOpportunities } from "@/constants/growthData"
 import { productKnowledgeLevels } from "@/constants/productKnowledgeData"
 import { scriptAdherenceData } from "@/constants/scriptAdherenceData"
 
@@ -73,6 +72,7 @@ import type {
 } from "@/types/dashboardTypes"
 import { mockMentionsData } from "@/constants/growthData"
 import type { CallMentionDetail } from "@/types"
+import React from "react"
 
 const iconMap: Record<string, React.ElementType> = {
   FileText,
@@ -93,13 +93,21 @@ export default function Dashboard() {
   if (!isAuthenticated) return null
 
   const [productStats, setProductStats] = useState<ProductStatItem[]>([])
+  const [productStatsLoading, setProductStatsLoading] = useState(true)
+
   useEffect(() => {
-    fetchProductStats().then(setProductStats).catch(console.error)
+    fetchProductStats()
+      .then((data) => setProductStats(data))
+      .catch(console.error)
+      .finally(() => setProductStatsLoading(false))
   }, [])
+
 
   const { sentimentData } = useSentimentData()
   const { salesData } = useSalesEffectiveness()
   const { strategicData } = useStrategicInsights()
+  const { data, isLoading } = useGrowthOpportunities()
+  // if (isLoading || !data) return <div>Loading...</div>
   const { audioRefs, togglePlay, playingAudio } = useAudioManager()
 
   // Dialog States
@@ -119,21 +127,38 @@ export default function Dashboard() {
   const [selectedGrowthOpportunityTopic, setSelectedGrowthOpportunityTopic] = useState<string | null>(null)
   const [selectedGrowthOpportunityTopicUrdu, setSelectedGrowthOpportunityTopicUrdu] = useState<string | null>(null)
   const [currentTopicMentions, setCurrentTopicMentions] = useState<CallMentionDetail[]>([])
+  const [agentCount, setAgentCount] = useState<number | null>(null)
 
-  useEffect(() => {
-    if (!isAuthenticated) {
-      router.push("/login")
-    }
-  }, [isAuthenticated, router])
+  // const [agentStats, setAgentStats] = useState<any[]>([])
+  // const [knowledge, setKnowledge] = useState<any>(null)
+  // const [topAgents, setTopAgents] = useState<any[]>([])
 
-  if (!isAuthenticated) {
-    return null
-  }
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/agent-performance`) // update with actual endpoint
+  //     const data = await res.json()
 
-  // const [productStats, setProductStats] = useState<ProductStatItem[]>([])
-  useEffect(() => {
-    fetchProductStats().then(setProductStats).catch(console.error)
-  }, [])
+  //     const formattedStats = data.agent_stats.map((stat: any) => ({
+  //       title: stat.title,
+  //       value: stat.value,
+  //       change: stat.change,
+  //       icon: iconMap[stat.title] || <Package className="h-4 w-4 text-primary" />,
+  //       trendIcon:
+  //         stat.trend === 'up' ? (
+  //           <ArrowUpRight className="h-3 w-3 mr-1" />
+  //         ) : (
+  //           <ArrowDownRight className="h-3 w-3 mr-1" />
+  //         ),
+  //       isPositive: stat.trend === 'up',
+  //     }))
+
+  //     setAgentStats(formattedStats)
+  //     setKnowledge(data.knowledge_distribution)
+  //     setTopAgents(data.top_agents)
+  //   }
+
+  //   fetchData()
+  // }, [])
 
   const handleProductStatClick = (item: ProductStatItem) => {
     setSelectedProductStat(item)
@@ -145,22 +170,17 @@ export default function Dashboard() {
     setIsKnowledgeDetailDialogOpen(true)
   }
 
-  // const handleProductStatClick = (item: ProductStatItem) => {
-  //   setSelectedProductStat(item)
-  //   setIsProductStatDetailDialogOpen(true)
-  // }
-
   const handleScriptAdherenceClick = (item: ScriptAdherenceItem) => {
     setSelectedScriptAdherenceItem(item)
     setIsScriptAdherenceDetailDialogOpen(true)
   }
 
-  const handleViewFullCallFromTopicList = (callId: string) => {
-    // This is a placeholder for now.
-    // In a real app, you would find the full call object and open the CallDetailsDialog.
-    console.log(`View full details for call: ${callId}`)
-    alert(`View full details for call: ${callId}`)
-  }
+  // const handleViewFullCallFromTopicList = (callId: string) => {
+  //   // This is a placeholder for now.
+  //   // In a real app, you would find the full call object and open the CallDetailsDialog.
+  //   console.log(`View full details for call: ${callId}`)
+  //   alert(`View full details for call: ${callId}`)
+  // }
   const Icon = iconMap[selectedProductStat?.iconName || "FileText"];
   return (
     <div className="flex-1 space-y-6 p-6 md:p-8 pt-6 bg-gradient-to-br from-white to-blue-50 dark:from-gray-900 dark:to-gray-800 subtle-pattern">
@@ -187,46 +207,63 @@ export default function Dashboard() {
         <TabsContent value="overview" className="space-y-6">
           {/* Product Stats Cards */}
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-5">
-            {productStats.map((stat: ProductStatItem) => {
-              const Icon = iconMap?.[stat.iconName] ?? FileText;
-              return (
+            {productStatsLoading
+              ? Array.from({ length: 5 }).map((_, idx) => (
                 <Card
-                  key={stat.id}
-                  className="stat-card card-enhanced overflow-hidden bg-white dark:bg-gray-900 border-0 shadow-soft-lg cursor-pointer hover:shadow-xl transition-shadow"
-                  onClick={() => handleProductStatClick(stat)}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") handleProductStatClick(stat);
-                  }}
-                  aria-haspopup="dialog"
-                  aria-labelledby={`stat-title-${stat.id}`}
+                  key={`skeleton-${idx}`}
+                  className="stat-card card-enhanced overflow-hidden bg-white dark:bg-gray-900 border-0 shadow-soft-lg animate-pulse"
                 >
-                  <CardHeader className={`flex flex-row items-center justify-between space-y-0 pb-2 ${stat.headerClass}`}>
-                    <CardTitle id={`stat-title-${stat.id}`} className="text-sm font-medium">
-                      {stat.title}
-                    </CardTitle>
-                    <div
-                      className={`h-8 w-8 rounded-full ${stat.iconContainerClass} flex items-center justify-center shadow-inner`}
-                    >
-                      <Icon className={`h-4 w-4 ${stat.iconClass}`} />
-                    </div>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <div className="h-4 w-24 bg-gray-300 dark:bg-gray-700 rounded" />
+                    <div className="h-8 w-8 bg-gray-300 dark:bg-gray-700 rounded-full" />
                   </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">{stat.value}</div>
-                    <div className="flex items-center mt-1">
-                      {stat.trend.direction === "up" ? (
-                        <ArrowUpRight className={`h-4 w-4 ${stat.trend.color} mr-1`} />
-                      ) : (
-                        <ArrowDownRight className={`h-4 w-4 ${stat.trend.color} mr-1`} />
-                      )}
-                      <p className={`text-xs ${stat.trend.color} font-medium`}>{stat.trend.change}</p>
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-1">Top issue: {stat.topIssue}</p>
+                  <CardContent className="space-y-2">
+                    <div className="h-6 w-16 bg-gray-300 dark:bg-gray-700 rounded" />
+                    <div className="h-4 w-12 bg-gray-300 dark:bg-gray-700 rounded" />
+                    <div className="h-3 w-28 bg-gray-300 dark:bg-gray-700 rounded" />
                   </CardContent>
                 </Card>
-              );
-            })}
+              ))
+              : productStats.map((stat: ProductStatItem) => {
+                const Icon = iconMap?.[stat.iconName] ?? FileText
+                return (
+                  <Card
+                    key={stat.id}
+                    className="stat-card card-enhanced overflow-hidden bg-white dark:bg-gray-900 border-0 shadow-soft-lg cursor-pointer hover:shadow-xl transition-shadow"
+                    onClick={() => handleProductStatClick(stat)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") handleProductStatClick(stat)
+                    }}
+                    aria-haspopup="dialog"
+                    aria-labelledby={`stat-title-${stat.id}`}
+                  >
+                    <CardHeader className={`flex flex-row items-center justify-between space-y-0 pb-2 ${stat.headerClass}`}>
+                      <CardTitle id={`stat-title-${stat.id}`} className="text-sm font-medium">
+                        {stat.title}
+                      </CardTitle>
+                      <div
+                        className={`h-8 w-8 rounded-full ${stat.iconContainerClass} flex items-center justify-center shadow-inner`}
+                      >
+                        <Icon className={`h-4 w-4 ${stat.iconClass}`} />
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">{stat.value}</div>
+                      <div className="flex items-center mt-1">
+                        {stat.trend.direction === "up" ? (
+                          <ArrowUpRight className={`h-4 w-4 ${stat.trend.color} mr-1`} />
+                        ) : (
+                          <ArrowDownRight className={`h-4 w-4 ${stat.trend.color} mr-1`} />
+                        )}
+                        <p className={`text-xs ${stat.trend.color} font-medium`}>{stat.trend.change}</p>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">Top issue: {stat.topIssue}</p>
+                    </CardContent>
+                  </Card>
+                )
+              })}
           </div>
 
           {/* Agent KPIs */}
@@ -240,12 +277,12 @@ export default function Dashboard() {
                   <CardDescription>Key performance indicators and knowledge metrics for all agents</CardDescription>
                 </div>
                 <Badge variant="outline" className="glass-effect text-primary border-primary/30">
-                  37 Active Agents
+                  {agentCount !== null ? `${agentCount} Active Agents` : 'Loading...'}
                 </Badge>
               </div>
             </CardHeader>
             <CardContent>
-              <AgentPerformancePanel />
+              <AgentPerformancePanel setAgentCount={setAgentCount} />
             </CardContent>
           </Card>
 
@@ -288,7 +325,7 @@ export default function Dashboard() {
                           <DialogHeader>
                             <DialogTitle>Additional Products</DialogTitle>
                           </DialogHeader>
-                          <FocusedSentimentBreakdown />
+                          <FocusedSentimentBreakdown sentimentData={sentimentData} />
                         </DialogContent>
                       </Dialog>
 
@@ -300,7 +337,7 @@ export default function Dashboard() {
                         </DialogTrigger>
                         <DialogContent className="sm:max-w-[800px]">
                           <DialogHeader><DialogTitle>Complete Sentiment Analysis</DialogTitle></DialogHeader>
-                          <ProductSentimentList />
+                          <ProductSentimentList sentimentData={sentimentData}/>
                         </DialogContent>
                       </Dialog>
                     </div>
@@ -349,12 +386,13 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent>
                 <StrategicInsightsPanel
-                  growthOpportunities={strategicData.growthOpportunities}
+                  growthOpportunities={data.growthOpportunities}
+                  mockMentionsData={data.mockMentionsData}
                   riskIndicators={strategicData.riskIndicators}
                   agentPerformance={strategicData.agentPerformance}
                   avgHoldTimeStats={strategicData.avgHoldTimeStats}
                   callEnvironmentStats={strategicData.callEnvironmentStats}
-                  mockMentionsData={mockMentionsData}
+                  // mockMentionsData={mockMentionsData}
                   togglePlay={togglePlay}
                   playingAudio={playingAudio}
                   setSelectedGrowthOpportunityTopic={setSelectedGrowthOpportunityTopic}

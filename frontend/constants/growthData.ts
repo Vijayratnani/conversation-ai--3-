@@ -8,7 +8,7 @@ export const growthOpportunities = [
     topic: "Mortgage refinancing interest",
     topicUrdu: "مارگیج ری فنانسنگ سود",
     mentions: 32,
-    trend: "+15%",
+    trend: "+15%", 
   },
   {
     id: "investment-inq",

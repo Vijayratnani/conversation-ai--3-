@@ -38,6 +38,12 @@ class AvgHoldTimeStats(BaseModel):
     diffFromLastMonth: str
     isImproved: bool
 
+class CallMentionDetail(BaseModel):
+    callId: str
+    callDate: str
+    agent: str
+    customer: str
+    mentionSnippet: str
 
 class StrategicInsightsResponse(BaseModel):
     growthOpportunities: List[GrowthOpportunity]
@@ -45,3 +51,4 @@ class StrategicInsightsResponse(BaseModel):
     riskIndicators: List[RiskIndicator]
     callEnvironmentStats: List[CallEnvironmentStat]
     avgHoldTimeStats: AvgHoldTimeStats  # ✅ new field added
+    # callMentionDetail: CallMentionDetail

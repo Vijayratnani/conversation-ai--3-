@@ -54,7 +54,7 @@ interface StrategicInsightsPanelProps {
   isGrowthOpportunityDetailDialogOpen: boolean
   selectedGrowthOpportunityTopic: string
 }
-
+ 
 const StrategicInsightsPanel: React.FC<StrategicInsightsPanelProps> = ({
   growthOpportunities,
   riskIndicators,

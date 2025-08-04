@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from schemas.dashboard import DashboardStats, DashboardProductStats, DrillDownDetails
 from services.call_service import call_service
-from services.dashboard_service import get_dashboard_product_stats
+from services.product_stats_service import get_dashboard_product_stats
 from services.drilldown_service import get_drilldown_details
 
 from db.session import get_db
@@ -23,6 +23,13 @@ async def get_dashboard_stats(
 async def product_stats(db: AsyncSession = Depends(get_db)):
     return await get_dashboard_product_stats(db)
 
+from services.agent_performance import get_agent_performance_data
+from schemas.agent_performance import AgentPerformanceResponse
+
+@router.get("/agent-performance", response_model=AgentPerformanceResponse)
+async def agent_performance(db: AsyncSession = Depends(get_db)):
+    return await get_agent_performance_data(db)
+
 # # api/v1/endpoints/dashboard.py
 # @router.get("/product/{product_id}/drilldown", response_model=DrillDownDetails)
 # async def get_drilldown(product_id: int, db: AsyncSession = Depends(get_db)):
@@ -30,7 +37,7 @@ async def product_stats(db: AsyncSession = Depends(get_db)):
 
 # api/v1/routes/analytics.py
 
-from services.analytics import get_sentiment_analysis# , get_sales_effectiveness
+from services.sentiment_analysis import get_sentiment_analysis# , get_sales_effectiveness
 
 @router.get("/sentiment")
 async def sentiment_data(db: AsyncSession = Depends(get_db)):
@@ -46,6 +53,14 @@ async def get_sales_effectiveness(db: AsyncSession = Depends(get_db)):
 from schemas.strategic_insights import StrategicInsightsResponse
 from services.strategic_insights_service import get_strategic_insights_data
 
-@router.get("/strategic-insights", response_model=StrategicInsightsResponse)
+@router.get("/strategic-insights") # , response_model=StrategicInsightsResponse
 async def get_strategic_insights(db: AsyncSession = Depends(get_db)):
     return await get_strategic_insights_data(db)
+
+from services.topic_mentions import get_growth_opportunities
+from schemas.strategic_insights import CallMentionDetail
+from typing import List
+
+@router.get("/topic-mentions")
+async def fetch_topic_mentions(db: AsyncSession = Depends(get_db)):
+    return await get_growth_opportunities(db)

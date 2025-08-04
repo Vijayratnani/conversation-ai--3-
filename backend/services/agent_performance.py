@@ -23,6 +23,12 @@ async def get_agent_performance_data(db: AsyncSession) -> AgentPerformanceRespon
     previous_period_start = today - timedelta(days=60)
     previous_period_end = today - timedelta(days=30)
 
+    # ────────────── Active Agent Count ──────────────
+    active_agents_count = (await db.execute(
+        select(func.count()).select_from(Agent).where(Agent.is_active == True)
+    )).scalar() or 0
+
+
     # ────────────── 1. Avg. Call Quality ──────────────
     current_call_quality = (await db.execute(
         select(func.avg(Call.compliance_score)).where(Call.call_timestamp >= current_period_start)
@@ -189,4 +195,5 @@ async def get_agent_performance_data(db: AsyncSession) -> AgentPerformanceRespon
         agent_stats=agent_stats,
         knowledge_distribution=knowledge_distribution,
         top_agents=top_agents,
+        agent_count=active_agents_count,
     )

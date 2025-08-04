@@ -104,3 +104,11 @@ export interface StrategicInsightsData {
   riskIndicators: RiskIndicator[];
   callEnvironmentStats: CallEnvironmentStat[];
 }
+
+// export interface CallMentionDetail {
+//   callId: string
+//   callDate: string
+//   agentName: string
+//   customerIdentifier: string
+//   mentionSnippet: string
+// }

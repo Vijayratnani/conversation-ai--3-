@@ -2,7 +2,7 @@ import type { CallMentionDetail } from "@/types/dashboardTypes" // Replace with 
 
 export const generateMockMentions = (
   count: number,
-  topic: string,
+  topic: string, 
   callIdPrefix: string
 ): CallMentionDetail[] => {
   const mentions: CallMentionDetail[] = []

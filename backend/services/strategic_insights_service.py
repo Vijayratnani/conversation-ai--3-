@@ -5,6 +5,7 @@ from models import Agent, Call, ProductKnowledgeScore
 from schemas.strategic_insights import GrowthOpportunity
 from typing import List
 from datetime import datetime, timedelta, timezone
+from sqlalchemy import case
 
 now = datetime.now(timezone.utc)
 last_30_days = now - timedelta(days=30)
@@ -75,8 +76,6 @@ async def get_strategic_insights_data(db: AsyncSession) -> dict:
     needs_coaching_count = len(low_performers_result.all())
 
     # ========== 3. Risk Indicators ==========
-    from sqlalchemy import case
-
     risk_indicators = []
     # Current month low compliance calls
     low_compliance_this_month = (

@@ -1,6 +1,6 @@
 "use client"
 
-import { DashboardTabsProps } from "@/components/dashboard/DashboardTabs.types";
+// import { DashboardTabsProps } from "@/components/dashboard/DashboardTabs.types";
 
 import { useEffect, useState, useRef } from "react"
 import { useRouter } from "next/navigation"
@@ -37,8 +37,6 @@ import {
 import { AdvancedChatBot } from "@/components/advanced-chat-bot"
 import { TopicCallListDialog } from "@/components/topic-call-list-dialog"
 // import type { CallMentionDetail } from "@/types"
-
-// Define a more specific type for product knowledge items
 
 import AgentPerformancePanel from "@/components/analytics/AgentPerformancePanel"
 import SentimentOverviewCards from "@/components/analytics/SentimentOverviewCards"
@@ -136,14 +134,6 @@ export default function Dashboard() {
   useEffect(() => {
     fetchProductStats().then(setProductStats).catch(console.error)
   }, [])
-
-  // const { sentimentData } = useSentimentData();
-  // const { salesData } = useSalesEffectiveness();
-
-  // const handleKnowledgeItemClick = (item: ProductKnowledgeItem) => {
-  //   setSelectedKnowledgeItem(item)
-  //   setIsKnowledgeDetailDialogOpen(true)
-  // }
 
   const handleProductStatClick = (item: ProductStatItem) => {
     setSelectedProductStat(item)
@@ -483,7 +473,7 @@ export default function Dashboard() {
         />
       )}
 
-      <audio ref={audioRefs["dog-barking"] as RefObject<HTMLAudioElement>} />
+      {/* <audio ref={audioRefs["dog-barking"] as RefObject<HTMLAudioElement>} /> */}
 
       <audio ref={audioRefs["dog-barking"]} src="/audio/dog-barking.mp3" preload="auto" />
       <audio ref={audioRefs["cafe-chatter"]} src="/audio/cafe-chatter.mp3" preload="auto" />

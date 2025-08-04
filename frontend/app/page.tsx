@@ -53,6 +53,7 @@ import { useSentimentData } from "@/hooks/useSentimentData"
 import { useSalesEffectiveness } from "@/hooks/useSalesEffectiveness"
 import { useStrategicInsights } from "@/hooks/useStrategicInsights"
 import { useGrowthOpportunities } from "@/hooks/useGrowthOpportunities"
+import { useProductStats } from "@/hooks/useProductStats"
 
 import {
   // growthOpportunities,
@@ -92,16 +93,7 @@ export default function Dashboard() {
 
   if (!isAuthenticated) return null
 
-  const [productStats, setProductStats] = useState<ProductStatItem[]>([])
-  const [productStatsLoading, setProductStatsLoading] = useState(true)
-
-  useEffect(() => {
-    fetchProductStats()
-      .then((data) => setProductStats(data))
-      .catch(console.error)
-      .finally(() => setProductStatsLoading(false))
-  }, [])
-
+  const { productStats, isLoading: productStatsLoading, isError } = useProductStats()
 
   const { sentimentData } = useSentimentData()
   const { salesData } = useSalesEffectiveness()
@@ -456,7 +448,7 @@ export default function Dashboard() {
       )}
 
       {/* Product Stat Detail Dialog */}
-      {selectedProductStat && (
+      {/* {selectedProductStat && (
         <Dialog open={isProductStatDetailDialogOpen} onOpenChange={setIsProductStatDetailDialogOpen}>
           <DialogContent className="sm:max-w-lg md:max-w-xl lg:max-w-2xl">
             <DialogHeader>
@@ -476,7 +468,7 @@ export default function Dashboard() {
             </div>
           </DialogContent>
         </Dialog>
-      )}
+      )} */}
 
       {/* Script Adherence Detail Dialog */}
       {selectedScriptAdherenceItem && (

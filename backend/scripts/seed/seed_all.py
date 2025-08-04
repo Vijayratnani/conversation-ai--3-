@@ -74,7 +74,6 @@ async def main():
                 print(f"✅ Seeded {len(topics)} topics.")
             except Exception as e:
                 raise Exception(f"Error in seed_topics: {e}")
- 
             try:
                 print("🌱 Seeding Call Analysis Metadata...")
                 call_analysis = await seed_call_analysis_metadata(session,call_ids)
@@ -82,8 +81,6 @@ async def main():
                 print(f"✅ Seeded {len(call_analysis)} call analysis metadata records.")
             except Exception as e:
                 raise Exception(f"Error in seed_call_analysis_metadata: {e}")
- 
-            try:
                 print("🌱 Seeding Call Environment Factors...")
                 env_factors = await seed_call_environment_factor(session, [call.call_id for call in calls])
                 await session.commit()

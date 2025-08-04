@@ -5,10 +5,10 @@ from models.call_analysis_metadata import CallAnalysisMetadata
 import random
 import asyncio
 
+
 async def seed_call_analysis_metadata(db, calls_ids):
     try:
         records = []
-
         for call_id in calls_ids:
             record = CallAnalysisMetadata(
                 call_id=call_id,

@@ -13,10 +13,14 @@ async def seed_calls(db,agent_ids,customer_ids):
     try:
         records = []
         
-
         # agent_ids = list(range(1, NUM_AGENTS + 1))
         # customer_ids = list(range(1, NUM_CUSTOMERS + 1))
-        
+        outcome_to_keywords = {
+            "Resolved": "Billing, Service Upgrade, Discount",
+            "Escalated": "Service Complaint, Refund Request, Manager Escalation",
+            "Dropped": "Technical Issue, Connection Problem, Troubleshooting"
+        }
+
         for _ in range(NUM_CALLS_PER_AGENT * NUM_AGENTS):
             call_time = fake.date_time_between(start_date='-1y', end_date='now')
             duration = random.randint(30, 3600)  # seconds between 30 sec and 1 hour
@@ -28,6 +32,9 @@ async def seed_calls(db,agent_ids,customer_ids):
             sensitive_info = fake.boolean(chance_of_getting_true=5)
             transcript_available = fake.boolean(chance_of_getting_true=80)
 
+            keywords = outcome_to_keywords[outcome]
+
+            #From here the database tables entry starts(please hardcode data in variable above this )
             record = Call(
                 call_id=uuid4(),
                 agent_id=random.choice(agent_ids),
@@ -49,6 +56,7 @@ async def seed_calls(db,agent_ids,customer_ids):
                 interruptions=random.randint(0, 5),
                 compliance_score=round(random.uniform(0, 100), 2),
                 audio_recording_url=fake.url(),
+                keywords=keywords, 
             )
             records.append(record)
 

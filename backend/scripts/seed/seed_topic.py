@@ -12,6 +12,7 @@ async def seed_topics(db, num_records=5):  # default 20 topics, adjust as needed
             name_ur = fake.unique.word().capitalize()  # Faker doesn't support Urdu; just for demo
             category = fake.random_element(categories)
             
+            #From here the database tables entry starts(please hardcode data in variable above this)
             record = Topic(
                 name_en=name_en,
                 name_ur=name_ur,

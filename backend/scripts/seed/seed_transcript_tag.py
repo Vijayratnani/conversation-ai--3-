@@ -12,6 +12,7 @@ async def seed_transcript_tags(db, transcripts_ids, num_records=50):  # Provide 
         for _ in range(num_records):
             transcript_id = fake.random_element(transcripts_ids)  # transcripts should be list of transcript objects or IDs
 
+            #From here the database tables entry starts(please hardcode data in variable above this)
             record = TranscriptTag(
                 transcript_id=transcript_id,
                 type=fake.random_element(tag_types),

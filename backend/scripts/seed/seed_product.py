@@ -6,11 +6,20 @@ async def seed_products(db):
     try:
         records = []
 
-        
-        for _ in range(NUM_PRODUCTS):
+        product_options = [
+            ("Credit Cards", "Cards"),
+            ("Personal Loans", "Loans"),
+            ("Savings Account", "Accounts"),
+            ("Investment Products", "Investments"),
+            ("Mortgages", "Home Financing")
+        ]
+
+        for product_name, product_category in product_options:
+
+            #From here the database tables entry starts(please hardcode data in variable above this )
             record = Product(
-                name=fake.unique.word().title(),
-                category=fake.word().title()
+                name=product_name,
+                category=product_category,
             )
             records.append(record)
 

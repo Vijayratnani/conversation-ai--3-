@@ -8,7 +8,12 @@ import asyncio
 async def seed_call_analysis_metadata(db,calls_ids):
     try:
         records = []
+
         for call_id in calls_ids:
+
+
+
+            #From here the database tables entry starts(please hardcode data in variable above this )
             record = CallAnalysisMetadata(
                 call_id=call_id,
                 sentiment=random.choice(["positive", "neutral", "negative"]),

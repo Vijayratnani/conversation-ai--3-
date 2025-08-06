@@ -25,7 +25,7 @@ import type {
 } from "@/types/dashboardTypes"
 import { useAudioManager } from "@/hooks/useAudioManager"
 import { growthOpportunities, mockMentionsData } from "@/constants/growthData"
-import { productKnowledgeLevels } from "@/constants/productKnowledgeData"
+//import { productKnowledgeLevels } from "@/constants/productKnowledgeData" 
 import { scriptAdherenceData } from "@/constants/scriptAdherenceData"
 import { fetchProductStats } from "@/constants/fetchProductStatsData";
 import ProductStatDetailsContent from "@/components/analytics/ProductStatDetailsContent"
@@ -65,6 +65,7 @@ export default function Dashboard() {
   const [isCallDetailDialogOpen, setIsCallDetailDialogOpen] = useState(false)
   const [selectedCallForDetail, setSelectedCallForDetail] = useState<any | null>(null) // Use your actual Call type
   const { audioRefs, togglePlay, playingAudio } = useAudioManager()
+  const [productKnowledgeLevels, setProductKnowledgeLevels] = useState<ProductKnowledgeItem[]>([])
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -75,6 +76,21 @@ export default function Dashboard() {
   if (!isAuthenticated) {
     return null
   }
+
+  // useEffect for product-knowledge-level
+useEffect(() => {
+  async function fetchProductKnowledge() {
+    try {
+      const res = await fetch('http://127.0.0.1:8000/api/v1/dashboard/product-knowledge-level') // <--- updated URL
+      if (!res.ok) throw new Error('Failed to fetch product knowledge data')
+      const data = await res.json()
+      setProductKnowledgeLevels(data) // <--- assumes the response is in correct shape
+    } catch (error) {
+      console.error("Error fetching product knowledge levels:", error) // <--- clearer error logging
+    }
+  }
+  fetchProductKnowledge()
+}, [])
 
   const [productStats, setProductStats] = useState<ProductStatItem[]>([])
   useEffect(() => {

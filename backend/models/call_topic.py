@@ -4,6 +4,7 @@ from db.base_class import Base
 from sqlalchemy.dialects.postgresql import UUID
 from db.base_class import Base
 from sqlalchemy.orm import relationship
+from models.topic import Topic
 
 class CallTopic(Base):
     __tablename__ = 'call_topics'
@@ -15,10 +16,6 @@ class CallTopic(Base):
     mention_count = Column(Integer, default=1)
 
     __table_args__ = (UniqueConstraint("call_id", "topic_id", name="_call_topic_uc"),)
-
-    # Relationships
-    call = relationship("Call", back_populates="topics")
-    topic = relationship("Topic", back_populates="call_topics")
 
 # Relationships
     call = relationship("Call", back_populates="topics")

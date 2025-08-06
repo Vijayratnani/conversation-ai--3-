@@ -4,6 +4,7 @@ from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 from db.base_class import Base
 
+
 class CallAnalysisMetadata(Base):
     __tablename__ = 'call_analysis_metadata'
 
@@ -29,9 +30,6 @@ class CallAnalysisMetadata(Base):
 
     raw_json = Column(JSONB)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
-
-    # Relationships
-    call = relationship("Call", back_populates="call_analysis_metadata", uselist=False)
 
 
     # Relationships

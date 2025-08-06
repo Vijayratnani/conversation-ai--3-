@@ -12,6 +12,8 @@ async def seed_call_environment_factor(db, call_ids):
         noise_types = ["Background Music", "Echo", "Static", "Crowd Noise", "Silence"]
 
         for call_id in call_ids:
+
+            #From here the database tables entry starts(please hardcode data in variable above this)
             record = CallEnvironmentFactor(
                 call_id=call_id,  # Use actual call_id from seeded calls
                 noise_type=random.choice(noise_types),

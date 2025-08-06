@@ -8,6 +8,8 @@ async def seed_missed_script_points(db, adherence_ids):
     try:
         records = []
         for _ in range(len(adherence_ids)):
+
+            #From here the database tables entry starts(please hardcode data in variable above this)
             record = MissedScriptPoint(
                 adherence_id=random.choice(adherence_ids),
                 point_description=fake.sentence(nb_words=10),

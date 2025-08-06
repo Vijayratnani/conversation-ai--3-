@@ -4,6 +4,7 @@ from sqlalchemy.orm import relationship
 from db.base_class import Base
 from sqlalchemy.orm import relationship
 
+
 class Agent(Base):
     __tablename__ = 'agents'
 
@@ -18,3 +19,4 @@ class Agent(Base):
     # Relationships
     calls = relationship("Call", back_populates="agent")
     knowledge_scores = relationship("ProductKnowledgeScore", back_populates="agent")
+    script_adherences = relationship("ScriptAdherence", back_populates="agent")

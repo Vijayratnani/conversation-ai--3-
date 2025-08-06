@@ -4,6 +4,7 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from db.base_class import Base
+from models.transcript_tag import TranscriptTag
 
 class Transcript(Base):
     __tablename__ = 'transcripts'

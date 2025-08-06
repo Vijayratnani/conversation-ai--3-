@@ -2,13 +2,13 @@ from .seed_config import fake
 from models.product import Product
 import asyncio
 
-DASHBOARD_PRODUCTS = [
-    {"name": "Credit Cards", "category": "Banking"},
-    {"name": "Personal Loans", "category": "Loans"},
-    {"name": "Savings Accounts", "category": "Accounts"},
-    {"name": "Mortgages", "category": "Loans"},
-    {"name": "Investment Products", "category": "Investments"},
-]
+# DASHBOARD_PRODUCTS = [
+#     {"name": "Credit Cards", "category": "Banking"},
+#     {"name": "Personal Loans", "category": "Loans"},
+#     {"name": "Savings Accounts", "category": "Accounts"},
+#     {"name": "Mortgages", "category": "Loans"},
+#     {"name": "Investment Products", "category": "Investments"},
+# ]
 
 async def seed_products(db):
     try:
@@ -17,7 +17,7 @@ async def seed_products(db):
         product_options = [
             ("Credit Cards", "Cards"),
             ("Personal Loans", "Loans"),
-            ("Savings Account", "Accounts"),
+            ("Savings Accounts", "Accounts"),
             ("Investment Products", "Investments"),
             ("Mortgages", "Home Financing")
         ]

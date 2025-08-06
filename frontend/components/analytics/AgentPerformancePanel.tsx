@@ -101,7 +101,11 @@ const AgentPerformancePanel = ({ setAgentCount }: AgentPerformancePanelProps) =>
                   </div>
                   <div className={`mt-2 flex items-center text-xs text-${colors[key]}-600`}>
                     {key !== 'needs_improvement' ? <ArrowUpRight className="h-3 w-3 mr-1" /> : <ArrowDownRight className="h-3 w-3 mr-1" />}
-                    <span>{change ? `${change >= 0 ? '+' : ''}${change} from last month` : <Skeleton className="h-3 w-20" />}</span>
+                    <span>
+                      {change !== null && change !== undefined
+                        ? `${change >= 0 ? '+' : ''}${change} from last month`
+                        : <Skeleton className="h-3 w-20" />}
+                    </span>
                   </div>
                 </div>
               )
@@ -137,28 +141,28 @@ const AgentPerformancePanel = ({ setAgentCount }: AgentPerformancePanelProps) =>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {isLoading
           ? Array(4).fill(null).map((_, i) => (
-              <Skeleton key={i} className="h-24 w-full rounded-lg" />
-            ))
+            <Skeleton key={i} className="h-24 w-full rounded-lg" />
+          ))
           : agentStats.map((stat) => (
-              <div
-                key={stat.title}
-                className="bg-white dark:bg-muted/20 p-4 rounded-lg shadow-sm border border-muted/50"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="text-sm font-medium text-muted-foreground">{stat.title}</div>
-                  <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-                    {stat.icon}
-                  </div>
-                </div>
-                <div className="mt-2">
-                  <div className="text-2xl font-bold">{stat.value}</div>
-                  <div className={`flex items-center text-xs mt-1 ${getTrendColor(stat.isPositive)}`}>
-                    {stat.trendIcon}
-                    <span>{stat.change}</span>
-                  </div>
+            <div
+              key={stat.title}
+              className="bg-white dark:bg-muted/20 p-4 rounded-lg shadow-sm border border-muted/50"
+            >
+              <div className="flex items-center justify-between">
+                <div className="text-sm font-medium text-muted-foreground">{stat.title}</div>
+                <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                  {stat.icon}
                 </div>
               </div>
-            ))}
+              <div className="mt-2">
+                <div className="text-2xl font-bold">{stat.value}</div>
+                <div className={`flex items-center text-xs mt-1 ${getTrendColor(stat.isPositive)}`}>
+                  {stat.trendIcon}
+                  <span>{stat.change}</span>
+                </div>
+              </div>
+            </div>
+          ))}
       </div>
 
       {/* Top Agents */}
@@ -167,24 +171,24 @@ const AgentPerformancePanel = ({ setAgentCount }: AgentPerformancePanelProps) =>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {isLoading
             ? Array(3).fill(null).map((_, i) => (
-                <Skeleton key={i} className="h-14 w-full rounded-md" />
-              ))
+              <Skeleton key={i} className="h-14 w-full rounded-md" />
+            ))
             : topAgents.map((agent) => (
-                <div key={agent.name} className="flex items-center gap-3 p-2 rounded-md bg-muted/30">
-                  <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-medium">
-                    {agent.name.split(' ').map((n) => n[0]).join('')}
-                  </div>
-                  <div>
-                    <div className="font-medium text-sm">{agent.name}</div>
-                    <div className="text-xs text-muted-foreground">{agent.product} Specialist</div>
-                    <div className="flex items-center text-xs text-green-600 mt-0.5">
-                      <span className="font-medium mr-1">{agent.score}%</span>
-                      <ArrowUpRight className="h-3 w-3 mr-0.5" />
-                      <span>{agent.improvement}</span>
-                    </div>
+              <div key={agent.name} className="flex items-center gap-3 p-2 rounded-md bg-muted/30">
+                <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-medium">
+                  {agent.name.split(' ').map((n) => n[0]).join('')}
+                </div>
+                <div>
+                  <div className="font-medium text-sm">{agent.name}</div>
+                  <div className="text-xs text-muted-foreground">{agent.product} Specialist</div>
+                  <div className="flex items-center text-xs text-green-600 mt-0.5">
+                    <span className="font-medium mr-1">{agent.score}%</span>
+                    <ArrowUpRight className="h-3 w-3 mr-0.5" />
+                    <span>{agent.improvement}</span>
                   </div>
                 </div>
-              ))}
+              </div>
+            ))}
         </div>
       </div>
     </div>

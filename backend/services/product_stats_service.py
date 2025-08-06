@@ -80,8 +80,16 @@ async def get_dashboard_product_stats(db: AsyncSession):
         )
         last_count = last_result.scalar() or 0
 
+        if last_count:
+            change_percent = round(((current_count - last_count) / last_count) * 100, 1)
+        elif current_count > 0:
+            change_percent = 100.0  # or another sentinel like None
+        else:
+            change_percent = 0.0
+
+
         share_percent = round((current_count / total_complaints) * 100, 1)
-        change_percent = round(((current_count - last_count) / last_count) * 100, 1) if last_count else 0.0
+        # change_percent = round(((current_count - last_count) / last_count) * 100, 1) if last_count else 0.0
 
         # Top keyword this month
         top_issue_stmt = text("""

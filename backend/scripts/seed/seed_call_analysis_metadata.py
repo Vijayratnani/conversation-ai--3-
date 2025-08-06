@@ -43,12 +43,24 @@ PRODUCT_STATS_CONFIG = [
     },
 ]
 
-def generate_call(product_name, issue, created_at, call_id):
+
+def generate_call(product_name, issue, created_at, call_id, force_valid=True):
+    """
+    force_valid ensures the call will be counted in dashboard queries.
+    """
+    # If force_valid is True, these fields are fixed to ensure dashboard match.
+    if force_valid:
+        issue_detected = True
+        intent = ["complaint"]
+    else:
+        issue_detected = random.choice([True, False])
+        intent = random.choices(["complaint", "inquiry", "feedback"], weights=[0.7, 0.2, 0.1], k=1)
+
     return CallAnalysisMetadata(
         call_id=call_id,
         sentiment=random.choice(["negative", "neutral"]),
         emotions=[random.choice(["angry", "frustrated", "sad"])],
-        intent=["complaint"],
+        intent=intent,
         threat=random.choice([False, False, True]),
         churn_risk=random.choice(["medium", "high"]),
         entities=["fee", "wait time"],
@@ -60,8 +72,8 @@ def generate_call(product_name, issue, created_at, call_id):
         product_mentions=[
             {
                 "product": product_name,
-                "issue_detected": True,
-                "problem_keywords": [issue]
+                "issue_detected": issue_detected,
+                "problem_keywords": [issue, fake.word()]
             }
         ],
         service_mentions={"services": [fake.word()]},
@@ -70,6 +82,7 @@ def generate_call(product_name, issue, created_at, call_id):
         raw_json={"full_analysis": fake.text()},
         created_at=created_at
     )
+
 
 async def seed_call_analysis_metadata(db, call_ids):
     try:
@@ -83,19 +96,36 @@ async def seed_call_analysis_metadata(db, call_ids):
             past_count = stat["past_count"]
 
             # Seed recent (last 30 days)
-            for _ in range(recent_count):
-                if call_id_index >= len(call_ids): break
-                records.append(
-                    generate_call(product, issue, datetime.now(timezone.utc) - timedelta(days=random.randint(1, 30)), call_ids[call_id_index])
+            for i in range(recent_count):
+                if call_id_index >= len(call_ids):
+                    print(f"[WARN] Ran out of call_ids while seeding {product}")
+                    break
+
+                force_valid = (i == 0)  # Ensure at least one valid complaint per product
+                record = generate_call(
+                    product,
+                    issue,
+                    datetime.now(timezone.utc) - timedelta(days=random.randint(1, 30)),
+                    call_ids[call_id_index],
+                    force_valid=force_valid
                 )
+                records.append(record)
                 call_id_index += 1
 
             # Seed past (30–60 days ago)
             for _ in range(past_count):
-                if call_id_index >= len(call_ids): break
-                records.append(
-                    generate_call(product, issue, datetime.now(timezone.utc) - timedelta(days=random.randint(31, 60)), call_ids[call_id_index])
+                if call_id_index >= len(call_ids):
+                    print(f"[WARN] Ran out of call_ids while seeding {product}")
+                    break
+
+                record = generate_call(
+                    product,
+                    issue,
+                    datetime.now(timezone.utc) - timedelta(days=random.randint(31, 60)),
+                    call_ids[call_id_index],
+                    force_valid=False  # Past doesn't affect current dashboard stats
                 )
+                records.append(record)
                 call_id_index += 1
 
         db.add_all(records)

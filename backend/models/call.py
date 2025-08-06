@@ -9,7 +9,6 @@ from sqlalchemy.sql import func
 from db.base_class import Base
 from sqlalchemy import CheckConstraint
 
-
 class Call(Base):
     __tablename__ = 'calls'
 
@@ -18,7 +17,7 @@ class Call(Base):
     customer_id = Column(Integer, ForeignKey('customers.customer_id'))
     call_timestamp = Column(DateTime(timezone=True), nullable=False)
     duration_seconds = Column(Integer, nullable=False)
-    direction = Column(String(10), nullable=False)  # <--- this line
+    direction = Column(String(10), nullable=False)  
     __table_args__ = (
         CheckConstraint("direction IN ('inbound', 'outbound')", name="check_call_direction"),  # <--- this line
     )
@@ -27,6 +26,7 @@ class Call(Base):
     agent_sentiment = Column(String(50))
     flagged_for_review = Column(Boolean, default=False)
     summary = Column(Text)
+    keywords = Column(Text) 
     next_action = Column(Text)
     contains_sensitive_info = Column(Boolean, default=False)
     transcript_available = Column(Boolean, default=False)
@@ -47,3 +47,8 @@ class Call(Base):
     environment_factors = relationship("CallEnvironmentFactor", back_populates="call")
     topics = relationship("CallTopic", back_populates="call")
     call_analysis_metadata = relationship("CallAnalysisMetadata", back_populates="call", uselist=False)
+
+from models.customer import Customer
+from models.transcript import Transcript
+from models.call_environment_factor import CallEnvironmentFactor
+from models.call_topic import CallTopic

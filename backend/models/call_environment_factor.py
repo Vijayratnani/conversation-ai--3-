@@ -3,6 +3,7 @@ from sqlalchemy.orm import relationship
 from db.base_class import Base
 from sqlalchemy.dialects.postgresql import UUID
 
+
 class CallEnvironmentFactor(Base):
     __tablename__ = 'call_environment_factors'
 

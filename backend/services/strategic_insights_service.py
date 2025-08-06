@@ -1,11 +1,11 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, desc
-from models import CallTopic, Topic, CallEnvironmentFactor, CallAnalysisMetadata
-from models import Agent, Call, ProductKnowledgeScore
-from schemas.strategic_insights import GrowthOpportunity
-from typing import List
+from models import CallEnvironmentFactor, CallAnalysisMetadata # CallTopic, Topic,
+from models import Agent, Call # , ProductKnowledgeScore
+# from schemas.strategic_insights import GrowthOpportunity
+# from typing import List
 from datetime import datetime, timedelta, timezone
-from sqlalchemy import case
+# from sqlalchemy import case
 from services.risk_rules import risk_rules
 
 now = datetime.now(timezone.utc)

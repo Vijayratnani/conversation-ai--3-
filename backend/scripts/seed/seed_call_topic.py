@@ -11,6 +11,8 @@ async def seed_call_topic(db, call_ids, topic_ids):
         records = []
         for call_id in call_ids:
             for topic_id in random.sample(topic_ids, k=min(3, len(topic_ids))):  # up to 3 topics per call
+                
+                #From here the database tables entry starts(please hardcode data in variable above this)
                 record = CallTopic(
                     call_id=call_id,
                     topic_id=topic_id,

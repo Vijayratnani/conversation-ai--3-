@@ -2,7 +2,10 @@ from sqlalchemy import Column, Integer, ForeignKey, UniqueConstraint, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from db.base_class import Base
-
+from sqlalchemy.dialects.postgresql import UUID
+from db.base_class import Base
+from sqlalchemy.orm import relationship
+from models.topic import Topic
 
 class CallTopic(Base):
     __tablename__ = 'call_topics'
@@ -17,6 +20,6 @@ class CallTopic(Base):
         UniqueConstraint("call_id", "topic_id", name="_call_topic_uc"),
     )
 
-    # Relationships
+# Relationships
     call = relationship("Call", back_populates="topics")
     topic = relationship("Topic", back_populates="call_topics")

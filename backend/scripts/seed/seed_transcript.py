@@ -12,6 +12,7 @@ async def seed_transcripts(db, calls, num_records=100):
         for _ in range(num_records):
             call = random.choice(calls)  # calls should be list of call objects
 
+            #From here the database tables entry starts(please hardcode data in variable above this)
             record = Transcript(
                 call_id=call.call_id,
                 speaker=random.choice(speakers),

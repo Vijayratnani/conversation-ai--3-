@@ -10,6 +10,8 @@ async def seed_customers(db):
         records = []
 
         for _ in range(NUM_CUSTOMERS):
+
+            #From here the database tables entry starts(please hardcode data in variable above this )
             record = Customer(
                 identifier=str(uuid.uuid4()),  # unique identifier as UUID string
             )

@@ -74,6 +74,8 @@ import type {
 import { mockMentionsData } from "@/constants/growthData"
 import type { CallMentionDetail } from "@/types"
 import React from "react"
+//import { productKnowledgeLevels } from "@/constants/productKnowledgeData"
+import DashboardTabs from "@/components/dashboard/DashboardTabs"
 
 const iconMap: Record<string, React.ElementType> = {
   FileText,
@@ -120,6 +122,10 @@ export default function Dashboard() {
   const [selectedGrowthOpportunityTopicUrdu, setSelectedGrowthOpportunityTopicUrdu] = useState<string | null>(null)
   const [currentTopicMentions, setCurrentTopicMentions] = useState<CallMentionDetail[]>([])
   const [agentCount, setAgentCount] = useState<number | null>(null)
+  // You'll need a state for the CallDetailsDialog if it's opened from TopicCallListDialog
+  const [isCallDetailDialogOpen, setIsCallDetailDialogOpen] = useState(false)
+  const [selectedCallForDetail, setSelectedCallForDetail] = useState<any | null>(null) // Use your actual Call type
+  const [productKnowledgeLevels, setProductKnowledgeLevels] = useState<ProductKnowledgeItem[]>([])
 
   // const [agentStats, setAgentStats] = useState<any[]>([])
   // const [knowledge, setKnowledge] = useState<any>(null)
@@ -151,6 +157,33 @@ export default function Dashboard() {
 
   //   fetchData()
   // }, [])
+
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.push("/login")
+    }
+  }, [isAuthenticated, router])
+
+  if (!isAuthenticated) {
+    return null
+  }
+
+   // useEffect for product-knowledge-level
+useEffect(() => {
+  async function fetchProductKnowledge() {
+    try {
+      const res = await fetch('http://127.0.0.1:8000/api/v1/dashboard/product-knowledge-level') // <--- updated URL
+      if (!res.ok) throw new Error('Failed to fetch product knowledge data')
+      const data = await res.json()
+      setProductKnowledgeLevels(data) // <--- assumes the response is in correct shape
+    } catch (error) {
+      console.error("Error fetching product knowledge levels:", error) // <--- clearer error logging
+    }
+  }
+  fetchProductKnowledge()
+}, [])
+
 
   const handleProductStatClick = (item: ProductStatItem) => {
     setSelectedProductStat(item)

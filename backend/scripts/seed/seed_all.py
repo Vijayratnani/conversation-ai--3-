@@ -98,8 +98,8 @@ async def main():
  
             try:
                 print("🌱 Seeding Script Adherence...")
-                script_adherence = await seed_script_adherence(session, [call.call_id for call in calls], product_ids)
-                await session.commit()
+                script_adherence = await seed_script_adherence(session, [call.call_id for call in calls], product_ids,  agent_ids)
+                await session.commit() 
                 adherence_ids = [adherence.adherence_id for adherence in script_adherence if adherence.adherence_id is not None]
                 print(f"✅ Seeded {len(script_adherence)} script adherence.")
             except Exception as e:

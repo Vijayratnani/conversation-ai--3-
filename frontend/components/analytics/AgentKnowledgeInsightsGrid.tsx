@@ -21,9 +21,17 @@ interface AdherenceItem {
   }
 }
 
+interface AverageHandlingTimeItem {
+  product: string;
+  time: string;
+  trend: 'up' | 'down';
+  percent: string;
+}
+
 interface AgentKnowledgeInsightsGridProps {
   productKnowledgeLevels: KnowledgeItem[]
   scriptAdherenceData: AdherenceItem[]
+  averageHandlingTimeData: AverageHandlingTimeItem[];
   handleKnowledgeItemClick: (item: KnowledgeItem) => void
   handleScriptAdherenceClick: (item: AdherenceItem) => void
 }
@@ -31,6 +39,7 @@ interface AgentKnowledgeInsightsGridProps {
 const AgentKnowledgeInsightsGrid: React.FC<AgentKnowledgeInsightsGridProps> = ({
   productKnowledgeLevels,
   scriptAdherenceData,
+  averageHandlingTimeData,
   handleKnowledgeItemClick,
   handleScriptAdherenceClick,
 }) => {
@@ -159,12 +168,13 @@ const AgentKnowledgeInsightsGrid: React.FC<AgentKnowledgeInsightsGridProps> = ({
           Average Handling Time by Product Type
         </h3>
         <div className="grid gap-3 md:grid-cols-4">
-          {[
+          {/* {[
             { product: 'Credit Cards', time: '4:32', trend: 'down', percent: '8%' },
             { product: 'Personal Loans', time: '7:15', trend: 'up', percent: '5%' },
             { product: 'Savings Accounts', time: '3:45', trend: 'down', percent: '12%' },
             { product: 'Mortgages', time: '9:20', trend: 'up', percent: '3%' },
-          ].map((item) => (
+          ].map((item) => ( */}
+          {averageHandlingTimeData.map((item) => (
             <div
               key={item.product}
               className="bg-white dark:bg-muted/20 p-4 rounded-md shadow-sm border border-muted/50 text-center"

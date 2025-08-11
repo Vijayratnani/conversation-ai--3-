@@ -64,7 +64,7 @@ import {
 } from "@/constants/fetchProductStatsData"
 // import { growthOpportunities } from "@/constants/growthData"
 import { productKnowledgeLevels } from "@/constants/productKnowledgeData"
-import { scriptAdherenceData } from "@/constants/scriptAdherenceData"
+//import { scriptAdherenceData } from "@/constants/scriptAdherenceData"
 
 import type {
   ProductStatItem,
@@ -126,6 +126,8 @@ export default function Dashboard() {
   const [isCallDetailDialogOpen, setIsCallDetailDialogOpen] = useState(false)
   const [selectedCallForDetail, setSelectedCallForDetail] = useState<any | null>(null) // Use your actual Call type
   const [productKnowledgeLevels, setProductKnowledgeLevels] = useState<ProductKnowledgeItem[]>([])
+  const [scriptAdherenceData, setScriptAdherenceData] = useState<ScriptAdherenceItem[]>([])
+  const [averageHandlingTimeData, setAverageHandlingTimeData] = useState([]);
 
   // const [agentStats, setAgentStats] = useState<any[]>([])
   // const [knowledge, setKnowledge] = useState<any>(null)
@@ -184,6 +186,33 @@ useEffect(() => {
   fetchProductKnowledge()
 }, [])
 
+useEffect(() => {
+    async function fetchScriptAdherence() {
+      try {
+        const res = await fetch('http://127.0.0.1:8000/api/v1/dashboard/script-adherence-by-product');
+        if (!res.ok) throw new Error('Failed to fetch script adherence data');
+        const data = await res.json();
+        setScriptAdherenceData(data);
+      } catch (error) {
+        console.error("Error fetching script adherence data:", error);
+      }
+    }
+    fetchScriptAdherence();
+}, []);
+  
+  useEffect(() => {
+  async function fetchAHT() {
+    try {
+      const res = await fetch('http://127.0.0.1:8000/api/v1/dashboard/average-handling-time-by-product');
+      if (!res.ok) throw new Error('Failed to fetch AHT data');
+      const data = await res.json();
+      setAverageHandlingTimeData(data);
+    } catch (error) {
+      console.error("Error fetching AHT data:", error);
+    }
+  }
+  fetchAHT();
+}, []);
 
   const handleProductStatClick = (item: ProductStatItem) => {
     setSelectedProductStat(item)
@@ -441,6 +470,7 @@ useEffect(() => {
               <AgentKnowledgeInsightsGrid
                 productKnowledgeLevels={productKnowledgeLevels}
                 scriptAdherenceData={scriptAdherenceData}
+                averageHandlingTimeData={averageHandlingTimeData}
                 handleKnowledgeItemClick={handleKnowledgeItemClick}
                 handleScriptAdherenceClick={handleScriptAdherenceClick}
               />

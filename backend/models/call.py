@@ -8,6 +8,10 @@ from sqlalchemy.dialects.postgresql import JSONB,UUID,ENUM
 from sqlalchemy.sql import func
 from db.base_class import Base
 from sqlalchemy import CheckConstraint
+from models.customer import Customer
+from models.transcript import Transcript
+from models.call_environment_factor import CallEnvironmentFactor
+from models.call_topic import CallTopic
 
 class Call(Base):
     __tablename__ = 'calls'
@@ -48,7 +52,4 @@ class Call(Base):
     topics = relationship("CallTopic", back_populates="call")
     call_analysis_metadata = relationship("CallAnalysisMetadata", back_populates="call", uselist=False)
 
-from models.customer import Customer
-from models.transcript import Transcript
-from models.call_environment_factor import CallEnvironmentFactor
-from models.call_topic import CallTopic
+

@@ -24,5 +24,5 @@ from models.call_environment_factor import CallEnvironmentFactor
 from models.call_analysis_metadata import CallAnalysisMetadata
 
 # # ✅ Add these missing model imports
-# from models.script_adherence import ScriptAdherence
-# from models.product_knowledge_score import ProductKnowledgeScore
+from models.script_adherence import ScriptAdherence
+from models.product_knowledge_score import ProductKnowledgeScore

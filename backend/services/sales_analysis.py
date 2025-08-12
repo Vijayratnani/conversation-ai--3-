@@ -13,7 +13,7 @@ async def analyze_sales_effectiveness(db: AsyncSession) -> SalesEffectivenessRes
 
     total_calls = len(rows)
     successful_sales = 0
-    cross_sell_pairs = []
+    cross_sell_pairs = [] 
     missed_keywords = []
     missed_opportunities = 0
 
@@ -26,8 +26,8 @@ async def analyze_sales_effectiveness(db: AsyncSession) -> SalesEffectivenessRes
 
         product_mentions = data.get("product_mentions", [])
         for i in range(len(product_mentions) - 1):
-            from_product = product_mentions[i].get("product_name", "")
-            to_product = product_mentions[i + 1].get("product_name", "")
+            from_product = product_mentions[i].get("product", "")
+            to_product = product_mentions[i + 1].get("product", "")
             success = product_mentions[i + 1].get("converted", False)
             if from_product and to_product:
                 cross_sell_pairs.append((from_product, to_product, success))

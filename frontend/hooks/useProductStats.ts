@@ -1,57 +1,46 @@
 import useSWR from "swr"
 import { ProductStatItem } from "@/types/dashboardTypes"
 
-const productStyles: Record<
-  string,
+// Style presets based on descending danger level
+const dangerStyles = [
   {
-    iconContainerClass: string
-    iconClass: string
-    headerClass: string
-    iconName: string
-  }
-> = {
-  "credit cards": {
     iconContainerClass: "bg-red-100",
     iconClass: "text-red-500",
-    headerClass:
-      "bg-gradient-to-r from-red-50 to-red-100/50 dark:from-red-900/20 dark:to-red-800/10",
+    headerClass: "bg-gradient-to-r from-red-50 to-red-100/50 dark:from-red-900/20 dark:to-red-800/10",
     iconName: "FileText",
   },
-  "personal loans": {
+  {
     iconContainerClass: "bg-amber-100",
     iconClass: "text-amber-500",
-    headerClass:
-      "bg-gradient-to-r from-amber-50 to-amber-100/50 dark:from-amber-900/20 dark:to-amber-800/10",
+    headerClass: "bg-gradient-to-r from-amber-50 to-amber-100/50 dark:from-amber-900/20 dark:to-amber-800/10",
     iconName: "Package",
   },
-  "savings accounts": {
+  {
     iconContainerClass: "bg-blue-100",
     iconClass: "text-blue-500",
-    headerClass:
-      "bg-gradient-to-r from-blue-50 to-blue-100/50 dark:from-blue-900/20 dark:to-blue-800/10",
+    headerClass: "bg-gradient-to-r from-blue-50 to-blue-100/50 dark:from-blue-900/20 dark:to-blue-800/10",
     iconName: "BarChart3",
   },
-  "mortgages": {
+  {
     iconContainerClass: "bg-green-100",
     iconClass: "text-green-500",
-    headerClass:
-      "bg-gradient-to-r from-green-50 to-green-100/50 dark:from-green-900/20 dark:to-green-800/10",
+    headerClass: "bg-gradient-to-r from-green-50 to-green-100/50 dark:from-green-900/20 dark:to-green-800/10",
     iconName: "Headphones",
   },
-  "investment products": {
+  {
     iconContainerClass: "bg-purple-100",
     iconClass: "text-purple-500",
-    headerClass:
-      "bg-gradient-to-r from-purple-50 to-purple-100/50 dark:from-purple-900/20 dark:to-purple-800/10",
+    headerClass: "bg-gradient-to-r from-purple-50 to-purple-100/50 dark:from-purple-900/20 dark:to-purple-800/10",
     iconName: "Package",
   },
-  default: {
-    iconContainerClass: "bg-gray-100",
-    iconClass: "text-gray-500",
-    headerClass:
-      "bg-gradient-to-r from-gray-50 to-gray-100/50 dark:from-gray-900/20 dark:to-gray-800/10",
-    iconName: "BarChart3",
-  },
+]
+
+// Fallback style if index exceeds defined styles
+const defaultStyle = {
+  iconContainerClass: "bg-gray-100",
+  iconClass: "text-gray-500",
+  headerClass: "bg-gradient-to-r from-gray-50 to-gray-100/50 dark:from-gray-900/20 dark:to-gray-800/10",
+  iconName: "BarChart3",
 }
 
 const fetchProductStats = async (): Promise<ProductStatItem[]> => {
@@ -59,21 +48,20 @@ const fetchProductStats = async (): Promise<ProductStatItem[]> => {
   if (!res.ok) throw new Error("Failed to fetch product stats")
   const data = await res.json()
 
-  return data.map((item: any): ProductStatItem => {
+  return data.map((item: any, index: number): ProductStatItem => {
     const direction = item.trend > 0 ? "up" : item.trend < 0 ? "down" : "flat"
     const color =
       direction === "up"
         ? "text-red-500"
         : direction === "down"
-        ? "text-green-500"
-        : "text-muted-foreground"
+          ? "text-green-500"
+          : "text-muted-foreground"
     const changeText = `${item.trend > 0 ? "+" : ""}${item.trend}% from last month`
 
-    const key = item.product_name.trim().toLowerCase()
-    const style = productStyles[key] ?? productStyles["default"]
+    const style = dangerStyles[index] ?? defaultStyle
 
     return {
-      id: key.replace(/\s+/g, "-"),
+      id: item.product_name.trim().toLowerCase().replace(/\s+/g, "-"),
       title: item.product_name,
       value: `${item.value}%`,
       trend: {

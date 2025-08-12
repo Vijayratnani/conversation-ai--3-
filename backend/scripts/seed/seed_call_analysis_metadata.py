@@ -1,5 +1,3 @@
-# seed_call_analysis_metadata.py
-
 from .seed_config import fake
 from models.call_analysis_metadata import CallAnalysisMetadata
 from datetime import datetime, timedelta, timezone
@@ -44,43 +42,116 @@ PRODUCT_STATS_CONFIG = [
 ]
 
 
-def generate_call(product_name, issue, created_at, call_id, force_valid=True):
-    """
-    force_valid ensures the call will be counted in dashboard queries.
-    """
-    # If force_valid is True, these fields are fixed to ensure dashboard match.
-    if force_valid:
-        issue_detected = True
-        intent = ["complaint"]
-    else:
-        issue_detected = random.choice([True, False])
-        intent = random.choices(["complaint", "inquiry", "feedback"], weights=[0.7, 0.2, 0.1], k=1)
+def generate_call_metadata(
+    product_name,
+    issue,
+    created_at,
+    call_id,
+    sentiment="negative",
+    force_valid=True,
+    opportunity_detected=False,
+    agent_responded=True,
+    cross_sell=False,
+    cross_sell_success=False,
+    missed_keywords=None,
+):
+    issue_detected = True if force_valid else random.choice([True, False])
+    intent = ["complaint"] if force_valid else [random.choice(["complaint", "inquiry", "feedback"])]
+
+    product_mentions = [
+        {
+            "product": product_name,
+            "keywords": [issue],
+            "sentiment": sentiment,
+            "emotions": [random.choice(["anger", "frustration", "sadness"])],
+            "problem_keywords": [issue],
+            "opportunity_keywords": [],
+            "issue_detected": issue_detected,
+            "opportunity_detected": opportunity_detected,
+        }
+    ]
+
+    if cross_sell:
+        product_mentions.append({
+            "product": f"Upsell {product_name}",
+            "converted": cross_sell_success
+        })
+
+    customer_wishes_json = [
+        {
+            "wish": f"faster {issue.lower()} resolution",
+            "category": product_name,
+            "detected_keywords": [issue, "delay"],
+            "sentiment": sentiment,
+            "urgency": random.choice(["medium", "high"]),
+        }
+    ]
+
+    raw_json = {
+        "call_id": str(call_id),
+        "sentiment": sentiment,
+        "emotions": [random.choice(["anger", "frustration"])],
+        "intent": intent,
+        "threat": random.choice([True, False]),
+        "churn_risk": random.choice(["medium", "high"]),
+        "entities": ["fee", "wait time", issue],
+        "opportunity_detected": opportunity_detected,
+        "agent_responded": agent_responded,
+        "agent_response_score": round(random.uniform(0.6, 1.0), 2),
+        "compliance_score": round(random.uniform(70.0, 90.0), 2),
+        "product_mentions": product_mentions,
+        "service_mentions": [
+            {
+                "service": "customer support",
+                "keywords": ["delay"],
+                "sentiment": "negative",
+                "emotions": ["anger"],
+                "problem_keywords": ["delay"],
+                "opportunity_keywords": [],
+                "issue_detected": True,
+                "opportunity_detected": False
+            }
+        ],
+        "agent_mentions": [
+            {
+                "aspect": "responsiveness",
+                "keywords": ["did not respond", "delay"],
+                "sentiment": "negative",
+                "emotions": ["anger", "frustration"],
+                "problem_keywords": ["did not respond", "delay"],
+                "opportunity_keywords": [],
+                "issue_detected": True,
+                "coaching_opportunity": True
+            }
+        ],
+        "customer_behavior": {
+            "traits": ["frustrated", "demanding"],
+            "emotions": ["anger", "frustration"],
+            "sentiment": "negative",
+            "detected_keywords": [issue, "delay"]
+        },
+        "customer_wishes": customer_wishes_json
+    }
 
     return CallAnalysisMetadata(
         call_id=call_id,
-        sentiment=random.choice(["negative", "neutral"]),
-        emotions=[random.choice(["angry", "frustrated", "sad"])],
+        sentiment=sentiment,
+        emotions=raw_json["emotions"],
         intent=intent,
-        threat=random.choice([False, False, True]),
-        churn_risk=random.choice(["medium", "high"]),
-        entities=["fee", "wait time"],
-        opportunity_detected=False,
-        agent_responded=True,
-        agent_response_score=round(random.uniform(3.0, 6.0), 2),
-        compliance_score=round(random.uniform(70.0, 90.0), 2),
-        customer_behavior={"tone": "angry"},
-        product_mentions=[
-            {
-                "product": product_name,
-                "issue_detected": issue_detected,
-                "problem_keywords": [issue, fake.word()]
-            }
-        ],
-        service_mentions={"services": [fake.word()]},
-        agent_mentions={"agents": [fake.name()]},
-        customer_wishes={"wishes": [fake.sentence()]},
-        raw_json={"full_analysis": fake.text()},
-        created_at=created_at
+        threat=raw_json["threat"],
+        churn_risk=raw_json["churn_risk"],
+        entities=raw_json["entities"],
+        opportunity_detected=opportunity_detected,
+        agent_responded=agent_responded,
+        agent_response_score=raw_json["agent_response_score"],
+        compliance_score=raw_json["compliance_score"],
+        customer_behavior=raw_json["customer_behavior"],
+        product_mentions=product_mentions,
+        service_mentions={"services": ["online application"]},
+        agent_mentions={"agents": ["John Smith"]},
+        customer_wishes={"wishes": [w["wish"] for w in customer_wishes_json]},
+        raw_json=raw_json,
+        created_at=created_at,
     )
 
 
@@ -89,20 +160,57 @@ async def seed_call_analysis_metadata(db, call_ids):
         records = []
         call_id_index = 0
 
+        # ✅ Prepend 3 sales effectiveness test records
+        test_sales_records = [
+            generate_call_metadata(
+                "Credit Cards",
+                "Transaction disputes",
+                datetime.now(timezone.utc),
+                call_ids[0],
+                opportunity_detected=True,
+                agent_responded=True,
+                cross_sell=True,
+                cross_sell_success=True,
+            ),
+            generate_call_metadata(
+                "Personal Loans",
+                "Application delays",
+                datetime.now(timezone.utc),
+                call_ids[1],
+                opportunity_detected=True,
+                agent_responded=False,
+                cross_sell=False,
+                missed_keywords=["lower interest", "faster approval"],
+            ),
+            generate_call_metadata(
+                "Savings Accounts",
+                "Interest rate concerns",
+                datetime.now(timezone.utc),
+                call_ids[2],
+                opportunity_detected=True,
+                agent_responded=True,
+                cross_sell=True,
+                cross_sell_success=False,
+            ),
+        ]
+
+        records.extend(test_sales_records)
+        call_id_index = 3  # reserve first 3 for testing
+
+        # 🔁 Continue regular product stats seeding
         for stat in PRODUCT_STATS_CONFIG:
             product = stat["product"]
             issue = stat["top_issue"]
             recent_count = stat["recent_count"]
             past_count = stat["past_count"]
 
-            # Seed recent (last 30 days)
+            # Recent (last 30 days)
             for i in range(recent_count):
                 if call_id_index >= len(call_ids):
                     print(f"[WARN] Ran out of call_ids while seeding {product}")
                     break
-
-                force_valid = (i == 0)  # Ensure at least one valid complaint per product
-                record = generate_call(
+                force_valid = i == 0
+                record = generate_call_metadata(
                     product,
                     issue,
                     datetime.now(timezone.utc) - timedelta(days=random.randint(1, 30)),
@@ -112,18 +220,17 @@ async def seed_call_analysis_metadata(db, call_ids):
                 records.append(record)
                 call_id_index += 1
 
-            # Seed past (30–60 days ago)
+            # Past (30–60 days ago)
             for _ in range(past_count):
                 if call_id_index >= len(call_ids):
                     print(f"[WARN] Ran out of call_ids while seeding {product}")
                     break
-
-                record = generate_call(
+                record = generate_call_metadata(
                     product,
                     issue,
                     datetime.now(timezone.utc) - timedelta(days=random.randint(31, 60)),
                     call_ids[call_id_index],
-                    force_valid=False  # Past doesn't affect current dashboard stats
+                    force_valid=False
                 )
                 records.append(record)
                 call_id_index += 1

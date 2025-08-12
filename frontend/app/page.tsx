@@ -169,20 +169,20 @@ export default function Dashboard() {
     return null
   }
 
-   // useEffect for product-knowledge-level
-useEffect(() => {
-  async function fetchProductKnowledge() {
-    try {
-      const res = await fetch('http://127.0.0.1:8000/api/v1/dashboard/product-knowledge-level') // <--- updated URL
-      if (!res.ok) throw new Error('Failed to fetch product knowledge data')
-      const data = await res.json()
-      setProductKnowledgeLevels(data) // <--- assumes the response is in correct shape
-    } catch (error) {
-      console.error("Error fetching product knowledge levels:", error) // <--- clearer error logging
+  // useEffect for product-knowledge-level
+  useEffect(() => {
+    async function fetchProductKnowledge() {
+      try {
+        const res = await fetch('http://127.0.0.1:8000/api/v1/dashboard/product-knowledge-level') // <--- updated URL
+        if (!res.ok) throw new Error('Failed to fetch product knowledge data')
+        const data = await res.json()
+        setProductKnowledgeLevels(data) // <--- assumes the response is in correct shape
+      } catch (error) {
+        console.error("Error fetching product knowledge levels:", error) // <--- clearer error logging
+      }
     }
-  }
-  fetchProductKnowledge()
-}, [])
+    fetchProductKnowledge()
+  }, [])
 
 
   const handleProductStatClick = (item: ProductStatItem) => {
@@ -339,7 +339,7 @@ useEffect(() => {
                       setIsSentimentDetailDialogOpen={setIsSentimentDetailDialogOpen}
                     />
 
-                    <div className="flex justify-between items-center mt-2">
+                    <div className="flex justify-between items-center mt-6">
                       <Dialog>
                         <DialogTrigger asChild>
                           <Button variant="ghost" size="sm" className="text-xs text-muted-foreground">
@@ -362,7 +362,7 @@ useEffect(() => {
                         </DialogTrigger>
                         <DialogContent className="sm:max-w-[800px]">
                           <DialogHeader><DialogTitle>Complete Sentiment Analysis</DialogTitle></DialogHeader>
-                          <ProductSentimentList sentimentData={sentimentData}/>
+                          <ProductSentimentList sentimentData={sentimentData} />
                         </DialogContent>
                       </Dialog>
                     </div>
@@ -371,21 +371,40 @@ useEffect(() => {
               </CardContent>
             </Card>
 
-            {selectedSentimentItem && (
-              <Dialog open={isSentimentDetailDialogOpen} onOpenChange={setIsSentimentDetailDialogOpen}>
-                <DialogContent className="sm:max-w-[600px]">
+            {selectedSentimentItem && selectedSentimentItem.product && (
+              <Dialog
+                open={isSentimentDetailDialogOpen}
+                onOpenChange={setIsSentimentDetailDialogOpen}
+              >
+                <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
                   <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">
                       {selectedSentimentItem.product} Sentiment Analysis
                       {selectedSentimentItem.warning && (
-                        <Badge variant="destructive" className="text-xs py-1">
+                        <Badge
+                          variant="destructive"
+                          className="text-xs py-0.5 px-2 flex items-center gap-1"
+                        >
                           ⚠️ Consistent Negative
                         </Badge>
                       )}
                     </DialogTitle>
                   </DialogHeader>
+
+                  {/* Analysis panel */}
                   <SentimentAnalysisPanel selectedSentimentItem={selectedSentimentItem} />
+
+                  {/* Root Causes Summary (optional) */}
+                  {selectedSentimentItem.causes?.length > 0 && (
+                    <div className="mt-4 text-sm text-muted-foreground">
+                      <span className="font-medium text-gray-700 dark:text-gray-200">
+                        Root Causes:
+                      </span>{" "}
+                      {selectedSentimentItem.causes.join(', ')}
+                    </div>
+                  )}
                 </DialogContent>
+
               </Dialog>
             )}
 

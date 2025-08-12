@@ -24,65 +24,66 @@ const SentimentOverviewCards: React.FC<SentimentOverviewCardsProps> = ({
   setSelectedSentimentItem,
   setIsSentimentDetailDialogOpen,
 }) => {
-  const dataToRender = sentimentData.length > 0
-    ? sentimentData
-    : [
-        {
-          product: 'Demo Product',
-          positive: 60,
-          neutral: 30,
-          negative: 10,
-          warning: false,
-          causes: [],
-        },
-      ]
+  const dataToRender =
+    sentimentData.length > 0
+      ? sentimentData.slice(0, 3) // Show top 3
+      : [
+          {
+            product: 'Demo Product',
+            positive: 60,
+            neutral: 30,
+            negative: 10,
+            warning: false,
+            causes: [],
+          },
+        ]
 
   return (
-    <div className="grid gap-2">
-      {dataToRender.map((item, idx) => (
-        <div
-          key={item.product ?? `product-${idx}`}
-          className="bg-white dark:bg-muted/20 p-3 rounded-lg border-l-4 border-l-primary shadow-sm hover:shadow-md transition-shadow"
-        >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium">{item.product ?? 'Unnamed Product'}</span>
-              {item.warning && (
-                <Badge variant="destructive" className="text-xs py-0.5">
-                  ⚠️
-                </Badge>
-              )}
+    <div className="space-y-3">
+      {dataToRender.map((item, idx) => {
+        const total = (item.positive ?? 0) + (item.neutral ?? 0) + (item.negative ?? 0) || 1
+        const positivePct = ((item.positive ?? 0) / total) * 100
+        const neutralPct = ((item.neutral ?? 0) / total) * 100
+        const negativePct = ((item.negative ?? 0) / total) * 100
+
+        return (
+          <div
+            key={item.product ?? `product-${idx}`}
+            className="rounded-xl border shadow-sm bg-white dark:bg-gray-900 px-4 py-3 flex flex-col space-y-2"
+          >
+            {/* Title Row */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 font-medium text-sm">
+                {item.product ?? 'Unnamed Product'}
+                {item.warning && (
+                  <Badge variant="destructive" className="text-xs flex items-center gap-1">
+                    ⚠️
+                  </Badge>
+                )}
+              </div>
+
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-s px-4 py-1 h-auto"
+                onClick={() => {
+                  setSelectedSentimentItem(item)
+                  setIsSentimentDetailDialogOpen(true)
+                }}
+              >
+                Details
+              </Button>
             </div>
 
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-7 text-xs glass-effect bg-transparent"
-              onClick={() => {
-                setSelectedSentimentItem(item)
-                setIsSentimentDetailDialogOpen(true)
-              }}
-            >
-              Details
-            </Button>
+            {/* Sentiment Bar */}
+            <div className="h-2 w-full rounded-full overflow-hidden bg-gray-200 dark:bg-gray-800 flex">
+              <div className="bg-green-500" style={{ width: `${positivePct}%` }}></div>
+              <div className="bg-gray-400" style={{ width: `${neutralPct}%` }}></div>
+              <div className="bg-red-500" style={{ width: `${negativePct}%` }}></div>
+            </div>
           </div>
-
-          <div className="h-2 w-full bg-muted rounded-full overflow-hidden flex mt-2">
-            <div
-              className="h-full bg-green-500 transition-all duration-500"
-              style={{ width: `${item.positive ?? 0}%` }}
-            ></div>
-            <div
-              className="h-full bg-gray-300 transition-all duration-500"
-              style={{ width: `${item.neutral ?? 0}%` }}
-            ></div>
-            <div
-              className="h-full bg-red-500 transition-all duration-500"
-              style={{ width: `${item.negative ?? 0}%` }}
-            ></div>
-          </div>
-        </div>
-      ))}
+        )
+      })}
     </div>
   )
 }

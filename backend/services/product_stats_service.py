@@ -13,7 +13,7 @@ async def get_dashboard_product_stats(db: AsyncSession):
         select(func.count())
         .select_from(CallAnalysisMetadata)
         .filter(
-            CallAnalysisMetadata.intent.contains(['complaint']),
+            CallAnalysisMetadata.intent.contains(['complaint']), 
             CallAnalysisMetadata.created_at >= start_30_days_ago
         )
     )

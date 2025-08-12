@@ -17,6 +17,10 @@ interface SentimentAnalysisPanelProps {
 }
 
 const SentimentAnalysisPanel: React.FC<SentimentAnalysisPanelProps> = ({ selectedSentimentItem }) => {
+  const total = (selectedSentimentItem.positive ?? 0) + (selectedSentimentItem.neutral ?? 0) + (selectedSentimentItem.negative ?? 0) || 1
+  const positivePct = ((selectedSentimentItem.positive ?? 0) / total) * 100
+  const neutralPct = ((selectedSentimentItem.neutral ?? 0) / total) * 100
+  const negativePct = ((selectedSentimentItem.negative ?? 0) / total) * 100
   return (
     <div className="space-y-4 mt-2">
       {/* Sentiment Distribution */}
@@ -42,15 +46,15 @@ const SentimentAnalysisPanel: React.FC<SentimentAnalysisPanelProps> = ({ selecte
         <div className="h-4 w-full bg-muted rounded-full overflow-hidden flex">
           <div
             className="h-full bg-green-500"
-            style={{ width: `${selectedSentimentItem.positive}%` }}
+            style={{ width: `${positivePct}%` }}
           ></div>
           <div
             className="h-full bg-gray-300"
-            style={{ width: `${selectedSentimentItem.neutral}%` }}
+            style={{ width: `${neutralPct}%` }}
           ></div>
           <div
             className="h-full bg-red-500"
-            style={{ width: `${selectedSentimentItem.negative}%` }}
+            style={{ width: `${negativePct}%` }}
           ></div>
         </div>
 

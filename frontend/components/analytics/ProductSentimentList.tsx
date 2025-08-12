@@ -62,46 +62,51 @@ interface Props {
 const ProductSentimentList: React.FC<Props> = ({ sentimentData }) => {
   return (
     <div className="space-y-4 mt-2 max-h-[70vh] overflow-y-auto pr-2">
-      {sentimentData.map((item) => (
-        <div
-          key={item.product}
-          className="space-y-2 bg-white dark:bg-muted/20 p-4 rounded-lg border-l-4 border-l-primary shadow-sm"
-        >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="text-base font-medium">{item.product}</span>
-              {item.warning && (
-                <Badge variant="destructive" className="text-xs py-0.5">
-                  ⚠️ Consistent Negative
-                </Badge>
-              )}
+      {sentimentData.map((item) => {
+        const total = (item.positive ?? 0) + (item.neutral ?? 0) + (item.negative ?? 0) || 1
+        const positivePct = ((item.positive ?? 0) / total) * 100
+        const neutralPct = ((item.neutral ?? 0) / total) * 100
+        const negativePct = ((item.negative ?? 0) / total) * 100
+        return (
+          <div
+            key={item.product}
+            className="space-y-2 bg-white dark:bg-muted/20 p-4 rounded-lg border-l-4 border-l-primary shadow-sm"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-base font-medium">{item.product}</span>
+                {item.warning && (
+                  <Badge variant="destructive" className="text-xs py-0.5">
+                    ⚠️ Consistent Negative
+                  </Badge>
+                )}
+              </div>
+            </div>
+
+            <div className="h-3 w-full bg-muted rounded-full overflow-hidden flex">
+              <div className="h-full bg-green-500" style={{ width: `${positivePct}%` }}></div>
+              <div className="h-full bg-gray-300" style={{ width: `${neutralPct}%` }}></div>
+              <div className="h-full bg-red-500" style={{ width: `${negativePct}%` }}></div>
+            </div>
+
+            <div className="flex justify-between text-sm">
+              <span className="font-medium text-green-600">{item.positive}% Positive</span>
+              <span className="font-medium text-gray-500">{item.neutral}% Neutral</span>
+              <span className="font-medium text-red-600">{item.negative}% Negative</span>
+            </div>
+
+            <div className="mt-2 bg-muted/10 p-2 rounded-md">
+              <span className="text-sm font-semibold">Root causes: </span>
+              <div className="flex flex-wrap gap-2 mt-1">
+                {item.causes.map((cause) => (
+                  <Badge key={cause} variant="outline" className="bg-white dark:bg-muted/30">
+                    {cause}
+                  </Badge>
+                ))}
+              </div>
             </div>
           </div>
-
-          <div className="h-3 w-full bg-muted rounded-full overflow-hidden flex">
-            <div className="h-full bg-green-500" style={{ width: `${item.positive}%` }}></div>
-            <div className="h-full bg-gray-300" style={{ width: `${item.neutral}%` }}></div>
-            <div className="h-full bg-red-500" style={{ width: `${item.negative}%` }}></div>
-          </div>
-
-          <div className="flex justify-between text-sm">
-            <span className="font-medium text-green-600">{item.positive}% Positive</span>
-            <span className="font-medium text-gray-500">{item.neutral}% Neutral</span>
-            <span className="font-medium text-red-600">{item.negative}% Negative</span>
-          </div>
-
-          <div className="mt-2 bg-muted/10 p-2 rounded-md">
-            <span className="text-sm font-semibold">Root causes: </span>
-            <div className="flex flex-wrap gap-2 mt-1">
-              {item.causes.map((cause) => (
-                <Badge key={cause} variant="outline" className="bg-white dark:bg-muted/30">
-                  {cause}
-                </Badge>
-              ))}
-            </div>
-          </div>
-        </div>
-      ))}
+        )})}
     </div>
   )
 }

@@ -81,6 +81,8 @@ async def main():
                 print(f"✅ Seeded {len(call_analysis)} call analysis metadata records.")
             except Exception as e:
                 raise Exception(f"Error in seed_call_analysis_metadata: {e}")
+            
+            try:
                 print("🌱 Seeding Call Environment Factors...")
                 env_factors = await seed_call_environment_factor(session, [call.call_id for call in calls])
                 await session.commit()
@@ -107,12 +109,13 @@ async def main():
  
             try:
                 print("🌱 Seeding Missed Script Points...")
-                missed_points = await seed_missed_script_points(session, adherence_ids)
+                # Pass full ORM objects here, not just IDs
+                missed_points = await seed_missed_script_points(session, script_adherence)
                 await session.commit()
                 print(f"✅ Seeded {len(missed_points)} missed script points.")
             except Exception as e:
                 raise Exception(f"Error in seed_missed_script_points: {e}")
- 
+            
             try:
                 print("🌱 Seeding Product Knowledge Scores...")
                 scores = await seed_product_knowledge_scores(session, agent_ids, product_ids)
